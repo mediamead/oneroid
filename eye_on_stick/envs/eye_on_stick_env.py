@@ -8,8 +8,8 @@ NJ = 3                # number of joints/sections
 S_LEN = 1             # length of each section
 MIN_PHI = -np.pi/3    # min/max joint rotation angle
 MAX_PHI = np.pi/3
-DPHI = np.pi / 1000   # joint rotation angle delta per step
-MIN_T_PHI = 0         # min/max target angle
+DPHI = np.pi / 180    # joint rotation angle delta per step
+MIN_T_PHI = -np.pi/2  # min/max target angle
 MAX_T_PHI = np.pi/2
 TR = (NJ + 1) * S_LEN # distance to the target
 ALPHA_DONE = np.pi / 180  # done when within 1 degree to the target
@@ -51,10 +51,10 @@ class EyeOnStickEnv(gym.Env):
         abs_phi = 0
         x[i] = y[i] = 0
       else:
-        abs_phi += phi[i]
         x[i] = x[i-1]
         y[i] = y[i-1]
 
+      abs_phi += phi[i]
       x[i] += S_LEN * sin(abs_phi)
       y[i] += S_LEN * cos(abs_phi)
 
@@ -105,12 +105,12 @@ class EyeOnStickEnv(gym.Env):
     from gym.envs.classic_control import rendering
 
     if self.viewer is None:
-      self.viewer = rendering.Viewer(1000, 1000)
+      self.viewer = rendering.Viewer(500, 500)
       bound1 = TR * 0.1
       bound2 = TR * 1.1
-      self.viewer.set_bounds(-bound1, bound2, -bound1, bound2)
+      self.viewer.set_bounds(-bound2, bound2, -bound1, bound2)
 
-    self.viewer.draw_line((0, 0), (TR, 0))
+    self.viewer.draw_line((-TR, 0), (TR, 0))
     self.viewer.draw_line((0, 0), (0, TR))
 
     s = self.state
