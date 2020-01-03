@@ -8,7 +8,7 @@ NJ = 3                # number of joints/sections
 S_LEN = 1             # length of each section
 MIN_PHI = -np.pi/3    # min/max joint rotation angle
 MAX_PHI = np.pi/3
-DPHI = np.pi / 180    # joint rotation angle delta per step
+DPHI = np.pi /180/2   # joint rotation angle delta per step: half degree
 MIN_T_PHI = -np.pi/2  # min/max target angle
 MAX_T_PHI = np.pi/2
 TR = (NJ + 1) * S_LEN # distance to the target
@@ -26,12 +26,42 @@ class EyeOnStickEnv(gym.Env):
     self.action_space = spaces.Box(low=-1, high=1, shape=(NJ,))
 
     self.observation_space = spaces.Dict({
+      "t_phi": spaces.Box(low=MIN_T_PHI, high=MAX_T_PHI, shape=(1, )),
       "phi": spaces.Box(low=MIN_PHI, high=MAX_PHI, shape=(NJ,), dtype=np.float32), # joint angles
     })
 
     self.sections = np.full(NJ, S_LEN)
 
     self.np_random, _  = seeding.np_random()
+
+  def reset(self):
+    # place target on a circle with radius of TR and random angle
+    t_r = TR
+    t_phi = self.np_random.uniform(low=MIN_T_PHI, high=MAX_T_PHI)
+    t_coords = (t_r * sin(t_phi), t_r * cos(t_phi))
+
+    self.state = {
+      # target: distance, angle, coords
+      "target": [t_r, t_phi, t_coords],
+      # joints: angles
+      "phi": self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,)),
+      # allocate space for coords of section joints
+      "_x": np.zeros(NJ,),
+      "_y": np.zeros(NJ,)
+    }
+
+    print("---")
+    print("t_phi: %.2f" % t_phi)
+    print("Initial phi[]: %s" % self.state["phi"])
+
+    return self._get_obs()
+
+  def _get_obs(self):
+    t_phi = self.state["target"][1]
+    phi = self.state["phi"]
+    return np.array([
+      t_phi, phi[0], phi[1], phi[2] # angles FIXME
+    ])
 
   def step(self, action):
     phi = self.state["phi"]
@@ -46,17 +76,17 @@ class EyeOnStickEnv(gym.Env):
       if phi[i] < MIN_PHI: phi[i] = MIN_PHI
       elif phi[i] > MAX_PHI: phi[i] = MAX_PHI
 
-      # calculate positions of the end of the section, on top of previous one
+      # calculate positions of endpoints, each on top of previous one
       if i == 0:
-        abs_phi = 0
+        ep_phi = 0
         x[i] = y[i] = 0
       else:
         x[i] = x[i-1]
         y[i] = y[i-1]
 
-      abs_phi += phi[i]
-      x[i] += S_LEN * sin(abs_phi)
-      y[i] += S_LEN * cos(abs_phi)
+      ep_phi += phi[i]
+      x[i] += S_LEN * sin(ep_phi)
+      y[i] += S_LEN * cos(ep_phi)
 
       # accumulate cost of joint movements
       #   lower joints are more expensive to move
@@ -64,42 +94,24 @@ class EyeOnStickEnv(gym.Env):
       #   stronger bends are more expensive 
       cost += (phi[i])**4 # 0 .. 1.2 (assuming 60 degrees max bends)
 
-    reward, done = self._get_reward_done(x[-1], y[-1], abs_phi) - cost
+    reward, done, info = self._get_reward_done(x[-1], y[-1], ep_phi)
+    return self._get_obs(), reward - cost, done, info
 
-    return self._get_obs(), reward, done, {}
-
-  def reset(self):
-    t_phi = self.np_random.uniform(low=MIN_T_PHI, high=MAX_T_PHI)
-    t_x = TR * sin(t_phi)
-    t_y = TR * cos(t_phi)
-
-    self.state = {
-      # joint angles
-      "phi": self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,)),
-      # target angle
-      "target": [t_x, t_y],
-      "_x": np.zeros(NJ,),
-      "_y": np.zeros(NJ,)
-    }
-    return self._get_obs()
-
-  def _get_obs(self):
-    phi = self.state["phi"]
-    return np.array([
-      cos(phi[0]), sin(phi[0]),
-      cos(phi[1]), sin(phi[1]),
-      cos(phi[2]), sin(phi[2]), # angles FIXME
-
-    ])
-
-  def _get_reward_done(self, x, y, phi):
-    t_x = self.state["target"][0] - x
-    t_y = self.state["target"][1] - y
+  def _get_reward_done(self, x, y, ep_phi):
+    t_coords = self.state["target"][2]
+    (t_dx, t_dy) = (t_coords[0] - x, t_coords[1] - y)
     # d = sqrt(dx**2 + dy**2)
-    alpha = np.abs(phi - arctan2(t_x, t_y))
+
+    ep_t_alpha = arctan2(t_dx, t_dy)
+    alpha = np.abs(ep_phi - ep_t_alpha)
+
     reward = alpha / (np.pi/2) * 90 # 0 .. 90
     done = (alpha < ALPHA_DONE)
-    return reward, done
+
+    info = "ep_t_alpha: %6.2f, ep_phi: %6.2f, reward: %6.2f" % \
+      (ep_t_alpha, ep_phi, reward)
+
+    return reward, done, info
 
   def render(self, mode='human'):
     from gym.envs.classic_control import rendering
@@ -117,8 +129,7 @@ class EyeOnStickEnv(gym.Env):
     if s is None: return None
     x = self.state["_x"]
     y = self.state["_y"]
-    t_x = self.state["target"][0]
-    t_y = self.state["target"][1]
+    t_coords = self.state["target"][2]
 
     x0 = y0 = 0
     for i in range(NJ):
@@ -132,7 +143,7 @@ class EyeOnStickEnv(gym.Env):
       (x0, y0) = (x[i], y[i])
 
     # draw red circle for the target
-    t = rendering.Transform(translation=(t_x, t_y))
+    t = rendering.Transform(translation=t_coords)
     self.viewer.draw_circle(.05, color=(1, 0, 0)).add_attr(t)
 
     return self.viewer.render(return_rgb_array = mode=='rgb_array')
