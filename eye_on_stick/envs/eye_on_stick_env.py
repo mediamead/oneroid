@@ -70,8 +70,8 @@ class EyeOnStickEnv(gym.Env):
 
   def reset(self):
     t_phi = self.np_random.uniform(low=MIN_T_PHI, high=MAX_T_PHI)
-    t_x = TR * cos(t_phi)
-    t_y = TR * sin(t_phi)
+    t_x = TR * sin(t_phi)
+    t_y = TR * cos(t_phi)
 
     self.state = {
       # joint angles
@@ -97,7 +97,7 @@ class EyeOnStickEnv(gym.Env):
     t_y = self.state["target"][1] - y
     # d = sqrt(dx**2 + dy**2)
     alpha = np.abs(phi - arctan2(t_x, t_y))
-    reward = (np.pi/2 - alpha) / (np.pi/2) * 90 # 0 .. 90
+    reward = alpha / (np.pi/2) * 90 # 0 .. 90
     done = (alpha < ALPHA_DONE)
     return reward, done
 
@@ -105,24 +105,35 @@ class EyeOnStickEnv(gym.Env):
     from gym.envs.classic_control import rendering
 
     if self.viewer is None:
-      self.viewer = rendering.Viewer(500, 500)
+      self.viewer = rendering.Viewer(1000, 500)
       bound1 = TR * 0.1
       bound2 = TR * 1.1
       self.viewer.set_bounds(-bound2, bound2, -bound1, bound2)
 
-    self.viewer.draw_line((-TR, 0), (TR, 0))
-    self.viewer.draw_line((0, 0), (0, TR))
+    self.viewer.draw_line((-TR, 0), (TR, 0)).set_color(.5,.5, .5)
+    self.viewer.draw_line((0, 0), (0, TR)).set_color(.5,.5, .5)
 
     s = self.state
     if s is None: return None
     x = self.state["_x"]
     y = self.state["_y"]
+    t_x = self.state["target"][0]
+    t_y = self.state["target"][1]
 
     x0 = y0 = 0
     for i in range(NJ):
-      self.viewer.draw_line((x0, y0), (x[i], y[i]))
-      x0 = x[i]
-      y0 = y[i]
+      # draw blue lines for segments
+      l = self.viewer.draw_line((x0, y0), (x[i], y[i]))
+      l.set_color(0, 0, 1)
+
+      t = rendering.Transform(translation=(x0, y0))
+      self.viewer.draw_circle(.025, color=(0, 1, 0)).add_attr(t)
+
+      (x0, y0) = (x[i], y[i])
+
+    # draw red circle for the target
+    t = rendering.Transform(translation=(t_x, t_y))
+    self.viewer.draw_circle(.05, color=(1, 0, 0)).add_attr(t)
 
     return self.viewer.render(return_rgb_array = mode=='rgb_array')
 
