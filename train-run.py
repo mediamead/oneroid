@@ -13,10 +13,10 @@ env = gym.make('eye_on_stick:EyeOnStick-v0')
 # env = DummyVecEnv([lambda: env])
 
 model = PPO2(MlpPolicy, env, verbose=1)
-model.learn(total_timesteps=100000)
+model.learn(total_timesteps=10000)
 
 while True:
-    obs = env.reset()
+    obs = env.reset(keep_phi=True)
     done = False
     while not done:
         action, _states = model.predict(obs)
