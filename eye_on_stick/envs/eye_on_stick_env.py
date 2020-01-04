@@ -8,7 +8,7 @@ NJ = 3                # number of joints/sections
 S_LEN = 1             # length of each section
 MIN_PHI = -np.pi/3    # min/max joint rotation angle
 MAX_PHI = np.pi/3
-DPHI = np.pi /180/2   # joint rotation angle delta per step: half degree
+DPHI = np.pi /180 / 2 # joint rotation angle delta per step: half degree
 MIN_T_PHI = -np.pi/2  # min/max target angle
 MAX_T_PHI = np.pi/2
 TR = (NJ + 1) * S_LEN # distance to the target
@@ -22,17 +22,17 @@ class EyeOnStickEnv(gym.Env):
     self.state = None
 
     # robot can rotate on any number of its joints on each step
-    # each joint rotation action can be: -1 (CCW), 0 (no rotation), or 1(CW)
-    self.action_space = spaces.Box(low=-1, high=1, shape=(NJ,))
+    # each joint can have 3 rotation actions: CCW, no rotation, CW)
+    self.action_space = spaces.MultiDiscrete(np.full((NJ,), 3))
 
-    self.observation_space = spaces.Dict({
-      "t_phi": spaces.Box(low=MIN_T_PHI, high=MAX_T_PHI, shape=(1, )),
-      "phi": spaces.Box(low=MIN_PHI, high=MAX_PHI, shape=(NJ,), dtype=np.float32), # joint angles
-    })
+    # 1 x t_phi + NJ x phi
+    self.observation_space = spaces.Box(low=MIN_PHI, high=MAX_PHI, shape=(1+NJ,), dtype=np.float32)
 
-    self.sections = np.full(NJ, S_LEN)
+    self.seed()
 
-    self.np_random, _  = seeding.np_random()
+  def seed(self, seed=None):
+    self.np_random, seed = seeding.np_random(seed)
+    return [seed]
 
   def reset(self):
     # place target on a circle with radius of TR and random angle
@@ -47,7 +47,8 @@ class EyeOnStickEnv(gym.Env):
       "phi": self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,)),
       # allocate space for coords of section joints
       "_x": np.zeros(NJ,),
-      "_y": np.zeros(NJ,)
+      "_y": np.zeros(NJ,),
+      "_ass": None
     }
 
     print("---")
@@ -59,19 +60,18 @@ class EyeOnStickEnv(gym.Env):
   def _get_obs(self):
     t_phi = self.state["target"][1]
     phi = self.state["phi"]
-    return np.array([
-      t_phi, phi[0], phi[1], phi[2] # angles FIXME
-    ])
+    return [t_phi, phi[0], phi[1], phi[2]] # FIXME
 
   def step(self, action):
     phi = self.state["phi"]
     x = self.state["_x"]
     y = self.state["_y"]
-    cost = 0
+    ##cost = 0
 
     # update joint angles, section endpoint coordinates, accumulate costs
     for i in range(NJ):
-      dphi = DPHI * action[i]
+      a = action[i] - 1 # (0..2 => -1=CCW, 0=stay, 1=CW)
+      dphi = DPHI * a
       phi[i] += dphi
       if phi[i] < MIN_PHI: phi[i] = MIN_PHI
       elif phi[i] > MAX_PHI: phi[i] = MAX_PHI
@@ -90,37 +90,54 @@ class EyeOnStickEnv(gym.Env):
 
       # accumulate cost of joint movements
       #   lower joints are more expensive to move
-      cost += action[i]**2 * (NJ-i)**2 # 0 .. 9
+      ##cost += action[i]**2 * (NJ-i)**2 # 0 .. 9
       #   stronger bends are more expensive 
-      cost += (phi[i])**4 # 0 .. 1.2 (assuming 60 degrees max bends)
+      ## cost += (phi[i])**4 # 0 .. 1.2 (assuming 60 degrees max bends)
 
-    reward, done, info = self._get_reward_done(x[-1], y[-1], ep_phi)
-    return self._get_obs(), reward - cost, done, info
+    (alpha, dist) = self._get_ass(x[-1], y[-1], ep_phi)
+    ass0 = self.state["_ass"]
+    if ass0 is None:
+      reward = 0
+    elif (alpha < ass0[0]):
+      reward = +1
+    else:
+      reward = -1
+    done = (alpha < ALPHA_DONE)
+    self.state["_ass"] = (alpha, dist)
 
-  def _get_reward_done(self, x, y, ep_phi):
-    # calc absolute view angle to the target
+    #a_reward = 100 - alpha / (np.pi/2) * 90 # 100 .. -80
+
+    #reward, done, info = self._get_reward_done(x[-1], y[-1], ep_phi)
+    #reward -= cost
+    info = {}
+    return self._get_obs(), reward, done, info
+
+  def _get_ass(self, x, y, ep_phi):
+    # return target view angle and distance
     t_coords = self.state["target"][2]
     (t_dx, t_dy) = (t_coords[0] - x, t_coords[1] - y)
 
     ep_t_alpha = arctan2(t_dx, t_dy)
     alpha = np.abs(ep_phi - ep_t_alpha)
 
-    d = np.sqrt(t_dx**2 + t_dy**2)
+    dist = np.sqrt(t_dx**2 + t_dy**2)
+    return (alpha, dist)
+
     # max_d = TR + S_LEN * NJ => 4*S_LEN
     # min_d = TR - S_LEN * NJ = S_LEN
-    d_reward = (2 - d / S_LEN) * 10 # 20 .. -20
+    #d_reward = 0 # (2 - d / S_LEN) * 10 # 20 .. -20
 
     # calculate rewards
-    a_reward = 100 - alpha / (np.pi/2) * 90 # 100 .. -80
-    reward = a_reward + d_reward
-    done = (alpha < ALPHA_DONE)
+    #reward = a_reward + d_reward
+    #done = (alpha < ALPHA_DONE)
 
     #info = "ep_t_alpha: %6.2f, ep_phi: %6.2f, reward: %6.2f" % \
     #  (ep_t_alpha, ep_phi, reward)
-    info = "alpha: %6.2f, d: %6.2f => a_reward: %6.2f, d_reward: %6.2f, reward: %6.2f" % \
-      (alpha, d, a_reward, d_reward, reward)
+    #info = "alpha: %6.2f, d: %6.2f => a_reward: %6.2f, d_reward: %6.2f, reward: %6.2f" % \
+    #  (alpha, d, a_reward, d_reward, reward)
+    #info = {}
 
-    return reward, done, info
+    #return reward, done, info
 
   def render(self, mode='human'):
     from gym.envs.classic_control import rendering
