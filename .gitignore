@@ -1,1 +1,4 @@
 eye_on_stick.egg-info
+eye_on_stick/__pycache__
+eye_on_stick/envs/__pycache__
+.vscode/.ropeproject
