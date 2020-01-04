@@ -105,7 +105,7 @@ class EyeOnStickEnv(gym.Env):
     ep_t_alpha = arctan2(t_dx, t_dy)
     alpha = np.abs(ep_phi - ep_t_alpha)
 
-    reward = alpha / (np.pi/2) * 90 # 0 .. 90
+    reward = 100 - alpha / (np.pi/2) * 90 # 100 .. -80
     done = (alpha < ALPHA_DONE)
 
     info = "ep_t_alpha: %6.2f, ep_phi: %6.2f, reward: %6.2f" % \
