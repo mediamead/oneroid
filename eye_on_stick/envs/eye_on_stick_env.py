@@ -98,30 +98,39 @@ class EyeOnStickEnv(gym.Env):
     return self._get_obs(), reward - cost, done, info
 
   def _get_reward_done(self, x, y, ep_phi):
+    # calc absolute view angle to the target
     t_coords = self.state["target"][2]
     (t_dx, t_dy) = (t_coords[0] - x, t_coords[1] - y)
-    # d = sqrt(dx**2 + dy**2)
 
     ep_t_alpha = arctan2(t_dx, t_dy)
     alpha = np.abs(ep_phi - ep_t_alpha)
 
-    reward = 100 - alpha / (np.pi/2) * 90 # 100 .. -80
+    d = np.sqrt(t_dx**2 + t_dy**2)
+    # max_d = TR + S_LEN * NJ => 4*S_LEN
+    # min_d = TR - S_LEN * NJ = S_LEN
+    d_reward = (2 - d / S_LEN) * 10 # 20 .. -20
+
+    # calculate rewards
+    a_reward = 100 - alpha / (np.pi/2) * 90 # 100 .. -80
+    reward = a_reward + d_reward
     done = (alpha < ALPHA_DONE)
 
-    info = "ep_t_alpha: %6.2f, ep_phi: %6.2f, reward: %6.2f" % \
-      (ep_t_alpha, ep_phi, reward)
+    #info = "ep_t_alpha: %6.2f, ep_phi: %6.2f, reward: %6.2f" % \
+    #  (ep_t_alpha, ep_phi, reward)
+    info = "alpha: %6.2f, d: %6.2f => a_reward: %6.2f, d_reward: %6.2f, reward: %6.2f" % \
+      (alpha, d, a_reward, d_reward, reward)
 
     return reward, done, info
 
   def render(self, mode='human'):
     from gym.envs.classic_control import rendering
 
+    # initialize viewer and draw axis
+    bound1 = TR * 0.1
+    bound2 = TR * 1.1
     if self.viewer is None:
       self.viewer = rendering.Viewer(1000, 500)
-      bound1 = TR * 0.1
-      bound2 = TR * 1.1
       self.viewer.set_bounds(-bound2, bound2, -bound1, bound2)
-
     self.viewer.draw_line((-TR, 0), (TR, 0)).set_color(.5,.5, .5)
     self.viewer.draw_line((0, 0), (0, TR)).set_color(.5,.5, .5)
 
@@ -137,6 +146,7 @@ class EyeOnStickEnv(gym.Env):
       l = self.viewer.draw_line((x0, y0), (x[i], y[i]))
       l.set_color(0, 0, 1)
 
+      # draw green circles for joints
       t = rendering.Transform(translation=(x0, y0))
       self.viewer.draw_circle(.025, color=(0, 1, 0)).add_attr(t)
 
