@@ -4,15 +4,15 @@ from gym.utils import seeding
 import numpy as np
 from numpy import cos, sin, arctan2
 
-NJ = 3                # number of joints/sections
+NJ = 2                # number of joints/sections
 S_LEN = 1             # length of each section
 MIN_PHI = -np.pi/3    # min/max joint rotation angle
 MAX_PHI = np.pi/3
-DPHI = np.pi /180 / 2 # joint rotation angle delta per step: half degree
-MIN_T_PHI = -np.pi/2  # min/max target angle
-MAX_T_PHI = np.pi/2
+DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
+MIN_T_PHI = MIN_PHI # -np.pi/2  # min/max target angle
+MAX_T_PHI = MAX_PHI # np.pi/2
 TR = (NJ + 1) * S_LEN # distance to the target
-ALPHA_DONE = np.pi / 180  # done when within 1 degree to the target
+ALPHA_DONE = np.pi / 180 * 2  # done when within +/- 2 degrees to the target
 
 class EyeOnStickEnv(gym.Env):
   metadata = {'render.modes': ['human']}
@@ -27,8 +27,8 @@ class EyeOnStickEnv(gym.Env):
 
     # 1 x t_phi + 1x alpha + NJ x phi
     self.observation_space = spaces.Box(
-      low=-1.0, high=1.0,
-      shape=(2*(2+NJ),),
+      low=MIN_PHI, high=MAX_PHI,
+      shape=((2+NJ),),
       dtype=np.float32)
 
     self.seed()
@@ -62,11 +62,15 @@ class EyeOnStickEnv(gym.Env):
     phi = self.state["phi"]
     alpha = self.state["alpha"]
     return [
-      sin(t_phi), cos(t_phi),
-      sin(phi[0]), cos(phi[0]),
-      sin(phi[1]), cos(phi[1]),
-      sin(phi[2]), cos(phi[2]),
-      sin(alpha), cos(alpha)
+      t_phi,
+      #sin(t_phi), cos(t_phi),
+      phi[0],
+      #sin(phi[0]), cos(phi[0]),
+      phi[1],
+      #sin(phi[1]), cos(phi[1]),
+      #phi[2], sin(phi[2]), cos(phi[2]),
+      alpha,
+      #sin(alpha), cos(alpha)
     ] # FIXME
 
   def step(self, action):
@@ -84,10 +88,10 @@ class EyeOnStickEnv(gym.Env):
     self.calc_state()
     alpha = self.state["alpha"]
 
-    if (alpha < alpha0):
-      reward = +1
+    if alpha >= alpha0:
+      reward = -10
     else:
-      reward = -1
+      reward = 100 # (alpha0 - alpha) / (DPHI*NJ) * 100
     done = (alpha < ALPHA_DONE)
 
     return self._get_obs(), reward, done, {}
