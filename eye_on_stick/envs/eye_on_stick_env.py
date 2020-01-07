@@ -4,15 +4,15 @@ from gym.utils import seeding
 import numpy as np
 from numpy import cos, sin, arctan2
 
-NJ = 2                # number of joints/sections
+NJ = 3                # number of joints/sections
 S_LEN = 1             # length of each section
 MIN_PHI = -np.pi/3    # min/max joint rotation angle
 MAX_PHI = np.pi/3
 DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
 MIN_T_PHI = MIN_PHI # -np.pi/2  # min/max target angle
 MAX_T_PHI = MAX_PHI # np.pi/2
-TR = (NJ + 1) * S_LEN # distance to the target
-ALPHA_DONE = np.pi / 180 * 2  # done when within +/- 2 degrees to the target
+TR = (1 + NJ) * S_LEN # distance to the target
+ALPHA_DONE = np.pi / 180 * 3  # done when within +/- 2 degrees to the target
 
 class EyeOnStickEnv(gym.Env):
   metadata = {'render.modes': ['human']}
@@ -38,7 +38,7 @@ class EyeOnStickEnv(gym.Env):
     return [seed]
 
   def reset(self, keep_phi=False):
-    # place target on a circle with radius of TR and random angle
+    # randomly place target on a circle with radius of TR and random angle
     t_r = TR
     t_phi = self.np_random.uniform(low=MIN_T_PHI, high=MAX_T_PHI)
     t_coords = (t_r * sin(t_phi), t_r * cos(t_phi))
@@ -46,8 +46,8 @@ class EyeOnStickEnv(gym.Env):
     # target: distance, angle, coords
     self.state["target"] = [t_r, t_phi, t_coords]
 
-    # joints: angles
-    if not keep_phi:
+    # randomize joint angles, unless we have ones already and want to keep
+    if (not "phi" in self.state) or not keep_phi:
       self.state["phi"] = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
 
     print("---")
@@ -68,7 +68,8 @@ class EyeOnStickEnv(gym.Env):
       #sin(phi[0]), cos(phi[0]),
       phi[1],
       #sin(phi[1]), cos(phi[1]),
-      #phi[2], sin(phi[2]), cos(phi[2]),
+      phi[2],
+      #sin(phi[2]), cos(phi[2]),
       alpha,
       #sin(alpha), cos(alpha)
     ] # FIXME
@@ -80,6 +81,7 @@ class EyeOnStickEnv(gym.Env):
     for i in range(NJ):
       a = action[i] - 1 # (0..2 => -1=CCW, 0=stay, 1=CW)
       dphi = DPHI * a
+      #print("action: %s, dphi: %f" % (a, dphi))
       phi[i] += dphi
       if phi[i] < MIN_PHI: phi[i] = MIN_PHI
       elif phi[i] > MAX_PHI: phi[i] = MAX_PHI
@@ -88,11 +90,12 @@ class EyeOnStickEnv(gym.Env):
     self.calc_state()
     alpha = self.state["alpha"]
 
-    if alpha >= alpha0:
+    d_alpha = np.abs(alpha0) - np.abs(alpha)
+    if d_alpha <=0:
       reward = -10
     else:
-      reward = 100 # (alpha0 - alpha) / (DPHI*NJ) * 100
-    done = (alpha < ALPHA_DONE)
+      reward = d_alpha / DPHI * 10
+    done = (np.abs(alpha) < ALPHA_DONE)
 
     return self._get_obs(), reward, done, {}
 
@@ -105,13 +108,13 @@ class EyeOnStickEnv(gym.Env):
     # calculate positions of endpoints, each on top of previous one
     for i in range(NJ):
       if i == 0:
-        ep_phi = 0
+        ep_phi = phi[i]
         x[i] = y[i] = 0
       else:
+        ep_phi += phi[i]
         x[i] = x[i-1]
         y[i] = y[i-1]
 
-      ep_phi += phi[i]
       x[i] += S_LEN * sin(ep_phi)
       y[i] += S_LEN * cos(ep_phi)
 
@@ -119,8 +122,9 @@ class EyeOnStickEnv(gym.Env):
     t_coords = self.state["target"][2]
     (t_dx, t_dy) = (t_coords[0] - x[-1], t_coords[1] - y[-1])
     ep_t_alpha = arctan2(t_dx, t_dy)
-    alpha = np.abs(ep_phi - ep_t_alpha)
+    alpha = ep_t_alpha - ep_phi
 
+    self.state["ep_phi"] = ep_phi
     self.state["alpha"] = alpha
 
   def render(self, mode='human'):
@@ -156,6 +160,13 @@ class EyeOnStickEnv(gym.Env):
     # draw red circle for the target
     t = rendering.Transform(translation=t_coords)
     self.viewer.draw_circle(.05, color=(1, 0, 0)).add_attr(t)
+
+    # draw alpha vector
+    ep_phi = self.state["ep_phi"]
+    alpha = self.state["alpha"]
+    l = self.viewer.draw_line((x[-1], y[-1]),
+      (x[-1] + S_LEN*sin(ep_phi + alpha), y[-1] + S_LEN*cos(ep_phi + alpha)))
+    l.set_color(1, 0, 0)
 
     return self.viewer.render(return_rgb_array = mode=='rgb_array')
 

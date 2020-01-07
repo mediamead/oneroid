@@ -12,11 +12,11 @@ env = gym.make('eye_on_stick:EyeOnStick-v0')
 # the env is now wrapped automatically when passing it to the constructor
 # env = DummyVecEnv([lambda: env])
 
-model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="./ppo2_eos_tensorboard/")
-model.learn(total_timesteps=20000)
+model = PPO2(MlpPolicy, env, verbose=1, tensorboard_log="./tensorboard/")
+model.learn(total_timesteps=10000)
 
 while True:
-    obs = env.reset(keep_phi=True)
+    obs = env.reset() #keep_phi=True)
     done = False
     while not done:
         action, _states = model.predict(obs)
