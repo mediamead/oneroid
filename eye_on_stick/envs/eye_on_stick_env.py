@@ -12,7 +12,7 @@ DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
 MIN_T_PHI = MIN_PHI # -np.pi/2  # min/max target angle
 MAX_T_PHI = MAX_PHI # np.pi/2
 TR = (1 + NJ) * S_LEN # distance to the target
-ALPHA_DONE = np.pi / 180 * 3  # done when within +/- 2 degrees to the target
+ALPHA_DONE = np.pi / 180 * 3  # done when within +/- 3 degrees to the target
 
 class EyeOnStickEnv(gym.Env):
   metadata = {'render.modes': ['human']}
@@ -50,9 +50,9 @@ class EyeOnStickEnv(gym.Env):
     if (not "phi" in self.state) or not keep_phi:
       self.state["phi"] = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
 
-    print("---")
-    print("t_phi: %.2f" % t_phi)
-    print("Initial phi[]: %s" % self.state["phi"])
+    #print("---")
+    #print("t_phi: %.2f" % t_phi)
+    #print("Initial phi[]: %s" % self.state["phi"])
 
     self.calc_state()
     return self._get_obs()
