@@ -28,7 +28,7 @@ class EyeOnStickEnv(gym.Env):
     # 1 x t_phi + 1x alpha + NJ x phi
     self.observation_space = spaces.Box(
       low=MIN_PHI, high=MAX_PHI,
-      shape=((2+NJ),),
+      shape=((1+NJ+2),),
       dtype=np.float32)
 
     self.seed()
@@ -50,10 +50,6 @@ class EyeOnStickEnv(gym.Env):
     if (not "phi" in self.state) or not keep_phi:
       self.state["phi"] = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
 
-    #print("---")
-    #print("t_phi: %.2f" % t_phi)
-    #print("Initial phi[]: %s" % self.state["phi"])
-
     self.calc_state()
     return self._get_obs()
 
@@ -62,17 +58,12 @@ class EyeOnStickEnv(gym.Env):
     phi = self.state["phi"]
     alpha = self.state["alpha"]
     return [
-      t_phi,
-      #sin(t_phi), cos(t_phi),
-      phi[0],
-      #sin(phi[0]), cos(phi[0]),
-      phi[1],
-      #sin(phi[1]), cos(phi[1]),
-      phi[2],
-      #sin(phi[2]), cos(phi[2]),
-      alpha,
-      #sin(alpha), cos(alpha)
-    ] # FIXME
+      t_phi, #sin(t_phi), cos(t_phi),
+      phi[0], #sin(phi[0]), cos(phi[0]),
+      phi[1], #sin(phi[1]), cos(phi[1]),
+      phi[2], #sin(phi[2]), cos(phi[2]),
+      alpha, 1.0/alpha #sin(alpha), cos(alpha)
+    ] # FIXME - hardcoded number of joints
 
   def step(self, action):
     phi = self.state["phi"]
@@ -92,7 +83,7 @@ class EyeOnStickEnv(gym.Env):
 
     d_alpha = np.abs(alpha0) - np.abs(alpha)
     if d_alpha <=0:
-      reward = -10
+      reward = -100
     else:
       reward = d_alpha / DPHI * 10
     done = (np.abs(alpha) < ALPHA_DONE)
