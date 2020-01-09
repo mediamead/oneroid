@@ -4,7 +4,7 @@ from gym.utils import seeding
 import numpy as np
 from numpy import cos, sin, arctan2
 
-NJ = 3                # number of joints/sections
+NJ = 4                # number of joints/sections
 S_LEN = 1             # length of each section
 MIN_PHI = -np.pi/3    # min/max joint rotation angle
 MAX_PHI = np.pi/3
@@ -28,7 +28,7 @@ class EyeOnStickEnv(gym.Env):
     # 1 x t_phi + 1x alpha + NJ x phi
     self.observation_space = spaces.Box(
       low=MIN_PHI, high=MAX_PHI,
-      shape=((1+NJ+2),),
+      shape=(NJ+2,),
       dtype=np.float32)
 
     self.seed()
@@ -54,15 +54,17 @@ class EyeOnStickEnv(gym.Env):
     return self._get_obs()
 
   def _get_obs(self):
-    t_phi = self.state["target"][1]
+    #t_phi = self.state["target"][1]
     phi = self.state["phi"]
     alpha = self.state["alpha"]
+    inv_alpha = 1.0/alpha # FIXME div by zero!
     return [
-      t_phi, #sin(t_phi), cos(t_phi),
+      #t_phi, #sin(t_phi), cos(t_phi),
       phi[0], #sin(phi[0]), cos(phi[0]),
       phi[1], #sin(phi[1]), cos(phi[1]),
       phi[2], #sin(phi[2]), cos(phi[2]),
-      alpha, 1.0/alpha #sin(alpha), cos(alpha)
+      phi[3], #sin(phi[3]), cos(phi[3]),
+      alpha, inv_alpha #sin(alpha), cos(alpha)
     ] # FIXME - hardcoded number of joints
 
   def step(self, action):
