@@ -3,7 +3,7 @@
 import gym
 import copy
 
-env = gym.make('eye_on_stick:EyeOnStick-v0')
+env = gym.make('sprut:Sprut-v0')
 
 while True:
   env.reset(keep_phi=True)

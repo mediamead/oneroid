@@ -6,7 +6,7 @@ from stable_baselines.common.policies import MlpPolicy
 from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2
 
-env = gym.make('eye_on_stick:EyeOnStick-v0')
+env = gym.make('sprut:Sprut-v0')
 model = PPO2.load("model")
 
 while True:

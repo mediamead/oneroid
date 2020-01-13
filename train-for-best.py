@@ -7,7 +7,7 @@ from stable_baselines.common.vec_env import DummyVecEnv
 from stable_baselines import PPO2
 
 def train_and_measure(learn_steps):
-    env = gym.make('eye_on_stick:EyeOnStick-v0')
+    env = gym.make('sprut:Sprut-v0')
 
     print("# Training for %d steps" % learn_steps)
     model = PPO2(MlpPolicy, env)
