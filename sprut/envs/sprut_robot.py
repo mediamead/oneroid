@@ -6,6 +6,7 @@ import pybullet_data
 import numpy as np
 
 NP = 4 # number of plates per section
+SPS = 240
 
 class Robot:
     NJ = 2 # number of sections
@@ -16,7 +17,7 @@ class Robot:
         #p.connect(p.DIRECT) # don't render
 
         p.configureDebugVisualizer(p.COV_ENABLE_GUI, 1)
-        p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 1)
+        p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, 0)
         p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 1)
 
@@ -72,7 +73,7 @@ class Robot:
 
 # --------------------------------------------------------------------
 
-    def updateCamera(self):
+    def getOffCenter(self):
         # Center of mass position and orientation of the camera box
         cam_p, cam_o, _, _, _, _ = p.getLinkState(self.bodyId, self.cameraLinkId)
         rot_matrix = p.getMatrixFromQuaternion(cam_o)
@@ -121,10 +122,14 @@ class Robot:
         return self.NJ * 2
 
     # step through the simluation
-    def _step(self, phis):
+    def step(self, phis, nsteps=1):
         for i in range(self.NJ):
             self.setJointPosition(i, phis[i*2], phis[i*2+1])
-        p.stepSimulation()
+        self.idle(nsteps)
+    
+    def idle(self, nsteps=1):
+        for _ in range(nsteps):
+            p.stepSimulation()
 
         #t += timeStep
         #print("%.2f" % t)
@@ -133,18 +138,22 @@ class Robot:
         p.disconnect()
 
     # step and calculate the reward
-    def action_reward(self, phis):
-        self._step(phis)
-        offCenter = self.updateCamera()
-        if offCenter is not None:
-            return 10 - offCenter * 10
+    def getRewardDone(self, offCenter0, offCenter1):
+        deltaOff = offCenter1 - offCenter0
+        done = False
+        if deltaOff < 0:
+            # offset goes down
+            reward = - deltaOff * 1000
         else:
-            return -10
+            reward = - deltaOff * 1000 * 3
+
+        if offCenter1 <= 0.04:
+            done = True
+
+        return reward, done
 
 if __name__ == "__main__":
-    t = 0
-    sps = 240
-    timeStep = 1./sps # default Bullet's timestep
+    timeStep = 1./240 # default Bullet's timestep
     
     LOGFILE = "log10s.txt"
     logf = open(LOGFILE, "w")
@@ -155,9 +164,24 @@ if __name__ == "__main__":
     r.reset([0.5, 0.25, 3])
     phis = [0.1, 0.05, 0.1, 0.05]
 
-    for i in range(10 * sps): # simulate for 10s
-        reward = r.reward(phis)
-        t += timeStep
-        print("%f %f" % (t, reward), file=logf)
+    nsteps = int(SPS / 10) # want to get 10 pfs
+
+    t = 0
+    offCenter0 = r.getOffCenter()
+    r.step(phis)
+    done = False
+
+    while not done:
+        t += timeStep * nsteps
+        r.idle(nsteps)
+        offCenter1 = r.getOffCenter()
+        (reward, done) = r.getRewardDone(offCenter0, offCenter1)
+        deltaOff = offCenter1 - offCenter0
+
+        log = "%f [%f %f %f] %f" % (t, offCenter0, deltaOff, offCenter1, reward)
+        print(log, file=logf)
+        print(log)
+
+        offCenter0 = offCenter1
 
     logf.close()
