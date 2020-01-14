@@ -8,7 +8,7 @@ MIN_PHI = -0.1        # min/max joint rotation angle
 MAX_PHI = 0.1
 DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
 
-import Robot from Sprut
+from sprut.envs.sprut_robot import Robot 
 
 class SprutEnv(gym.Env):
   metadata = {'render.modes': ['human']}
@@ -33,13 +33,13 @@ class SprutEnv(gym.Env):
     return [seed]
 
   def get_obs(self):
-    return np.concatenate([self.target, self.phis], , axis=0)
+    return np.concatenate([self.target, self.phis], axis=0)
 
   def reset(self):
-    self.target = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, shape=(2, )) # FIXME
+    self.target = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=2) # FIXME
     self.robot.reset(self.target)
-    
-    (self.phis, self.reward) = self.robot.step_reward(self.phis)
+    self.phis = np.zeros(self.nphis)
+
     return self.get_obs()
 
   def step(self, action):
@@ -51,6 +51,6 @@ class SprutEnv(gym.Env):
       if self.phis[i] < MIN_PHI: self.phis[i] = MIN_PHI
       elif self.phis[i] > MAX_PHI: self.phis[i] = MAX_PHI
 
-    (self.phis, self.reward) = self.robot.step_reward(self.phis)
+    self.reward = self.robot.action_reward(self.phis)
 
     return self.get_obs(), self.reward, False, {}
