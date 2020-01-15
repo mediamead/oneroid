@@ -101,11 +101,11 @@ class Robot:
                     y += i
                     m += 1
         if m > 0:
-            x /= m
-            y /= m
+            x = x / m / w - 1/2
+            y = y / m / h - 1/2
             #print("mass = %3d, target = %.3f %.3f" % (m, x, y))
-            offCenter = np.sqrt((1/2 - x/w)**2 + (1/2 - y/h)**2)
-            return offCenter
+            offCenter = np.sqrt(x**2 + y**2)
+            return (x, y, m, offCenter)
         else:
             return None
 
@@ -167,18 +167,18 @@ if __name__ == "__main__":
     nsteps = int(SPS / 10) # want to get 10 pfs
 
     t = 0
-    offCenter0 = r.getOffCenter()
+    (_, _, _, offCenter0) = r.getOffCenter()
     r.step(phis)
     done = False
 
     while not done:
         t += timeStep * nsteps
         r.idle(nsteps)
-        offCenter1 = r.getOffCenter()
+        (x, y, _, offCenter1) = r.getOffCenter()
         (reward, done) = r.getRewardDone(offCenter0, offCenter1)
         deltaOff = offCenter1 - offCenter0
 
-        log = "%f [%f %f %f] %f" % (t, offCenter0, deltaOff, offCenter1, reward)
+        log = "%f [%f %f | %s %f %s] %f" % (t, x, y, offCenter0, deltaOff, offCenter1, reward)
         print(log, file=logf)
         print(log)
 

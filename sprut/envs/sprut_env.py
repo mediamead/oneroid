@@ -39,7 +39,9 @@ class SprutEnv(gym.Env):
     self.target = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=2) # FIXME
     self.robot.reset(self.target)
     self.phis = np.zeros(self.nphis)
-    self.offCenter = self.robot.getOffCenter()
+    self.offCenter = self.robot.getOffCenter()[3]
+    self.accReward = 0
+    self.steps = 0
     return self.get_obs()
 
   def step(self, action):
@@ -52,11 +54,15 @@ class SprutEnv(gym.Env):
       elif self.phis[i] > MAX_PHI: self.phis[i] = MAX_PHI
 
     self.robot.step(self.phis, nsteps=int(240/2))
-    offCenter = self.robot.getOffCenter()
+    offCenter = self.robot.getOffCenter()[3]
     reward, done = self.robot.getRewardDone(self.offCenter, offCenter)
 
     deltaOff = offCenter - self.offCenter
-    log = "[%f %f %f] %f %s" % (self.offCenter, deltaOff, offCenter, reward, done)
+    self.accReward += reward
+    self.steps += 1
+
+    log = "[%f %f %f] %f %s (%d %.2f)" % (self.offCenter, deltaOff, offCenter, reward, done,
+      self.steps, self.accReward)
     print(log)
     self.offCenter = offCenter
 
