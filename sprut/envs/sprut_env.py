@@ -4,66 +4,56 @@ from gym.utils import seeding
 import numpy as np
 from numpy import cos, sin, arctan2
 
-MIN_PHI = -0.1        # min/max joint rotation angle
-MAX_PHI = 0.1
-DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
+MAX_PHI = 0.25         # min/max joint rotation angle
+MAX_TARGET_XY = 0.25
+TARGET_Z = 1
 
-from sprut.envs.sprut_robot import Robot 
+from sprut.robots.sprut import Robot 
 
 class SprutEnv(gym.Env):
   metadata = {'render.modes': ['human']}
 
-  def __init__(self):
-    self.robot = Robot()
+  def __init__(self, render=False):
+    self.robot = Robot(render)
 
     self.nphis = self.robot.get_nphis()
 
-    # robot can rotate on any number of its joints on each step
-    # each joint can have 3 rotation actions: CCW, no rotation, CW)
-    self.action_space = spaces.MultiDiscrete(np.full((self.nphis,), 3))
+    # phi
+    self.action_space = spaces.Box(
+      low=-1, high=1,
+      shape=(self.nphis,), dtype=np.float32)
 
-    # 1x alpha + NJ x phi
+    # phis + dx & dy
     self.observation_space = spaces.Box(
-      low=MIN_PHI, high=MAX_PHI, shape=(2 + self.nphis,), dtype=np.float32)
+      low=-1, high=1, shape=(1 + 2,), dtype=np.float32)
 
     self.seed()
 
+  def close(self):
+    self.robot.close()
+    
   def seed(self, seed=None):
     self.np_random, seed = seeding.np_random(seed)
     return [seed]
 
-  def get_obs(self):
-    return np.concatenate([self.target, self.phis], axis=0)
-
   def reset(self):
-    self.target = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=2) # FIXME
-    self.robot.reset(self.target)
+    self.target = self.np_random.uniform(low=-MAX_TARGET_XY, high=MAX_TARGET_XY, size=2)
+    self.target[1] = 0 # zero out Y
+    self.robot.setTarget([self.target[0], self.target[1], TARGET_Z])
     self.phis = np.zeros(self.nphis)
-    self.offCenter = self.robot.getOffCenter()[3]
-    self.accReward = 0
-    self.steps = 0
+
+    self.robot.update()
     return self.get_obs()
 
   def step(self, action):
-    # update joint angles according to the effect of the action
     for i in range(self.nphis):
-      a = action[i] - 1 # (0..2 => -1=CCW, 0=stay, 1=CW)
-      dphi = DPHI * a
-      self.phis[i] += dphi
-      if self.phis[i] < MIN_PHI: self.phis[i] = MIN_PHI
-      elif self.phis[i] > MAX_PHI: self.phis[i] = MAX_PHI
+      self.phis[i] = action[i] * MAX_PHI
 
-    self.robot.step(self.phis, nsteps=int(240/2))
-    offCenter = self.robot.getOffCenter()[3]
-    reward, done = self.robot.getRewardDone(self.offCenter, offCenter)
+    self.robot.step([self.phis[0], 0, 0, 0, 0, 0, 0, 0])
+    self.robot.update()
 
-    deltaOff = offCenter - self.offCenter
-    self.accReward += reward
-    self.steps += 1
+    return self.get_obs(), self.robot.qval, self.robot.done, {}
+  
+  def get_obs(self):
+    return [self.phis[0]/MAX_PHI, self.robot.dx, self.robot.dy]
 
-    log = "[%f %f %f] %f %s (%d %.2f)" % (self.offCenter, deltaOff, offCenter, reward, done,
-      self.steps, self.accReward)
-    print(log)
-    self.offCenter = offCenter
-
-    return self.get_obs(), reward, done, {}
