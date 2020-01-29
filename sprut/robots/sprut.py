@@ -132,22 +132,27 @@ class Robot:
     def update(self):
         oc = self.getOffCenter()
         if oc is not None:
+            self.target_found = True
             (dx, dy) = oc
-            if np.sqrt(dx**2+dy**2) < 0.02:
+            dr = np.sqrt(dx**2+dy**2)
+
+            if dr < 0.02:
                 qval = 10
                 done = True
             else:
                 qval = 0
                 done = False
         else:
+            self.target_found = False
             qval = -100
             done = True
-            dx = dy = 0
+            dx = dy = dr = 0
 
         self.qval = qval
         self.done = done
         self.dx = dx
         self.dy = dy
+        self.dr = dr
 
     def get_nphis(self):
         return NJ
