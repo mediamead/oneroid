@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sprut
+from sprut_robot import Robot, NJ
 import numpy as np
 
 if __name__ == "__main__":
@@ -17,10 +17,10 @@ if __name__ == "__main__":
     logXY = open("%s.xy-%f.txt" % (LOGFILE, dphi), "w")
 
     gui = False
-    r = sprut.Robot(render=gui)
+    r = Robot(render=gui)
 
     phi_values = np.arange(-np.pi/4, np.pi/4, dphi)
-    phis = np.zeros(sprut.NJ * 2)
+    phis = np.zeros(NJ * 2)
     for t_phi in phi_values:
         TR = 3
         t_x = TR * np.sin(t_phi)
