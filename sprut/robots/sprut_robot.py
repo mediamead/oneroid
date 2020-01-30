@@ -6,7 +6,7 @@ import pybullet_data
 import numpy as np
 
 NP = 4 # number of plates per section
-NJ = 4 # number of sections
+NJ = 3 # number of sections
 
 H = 200
 W = 200

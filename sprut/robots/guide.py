@@ -34,7 +34,7 @@ if __name__ == "__main__":
     DPHIS = [-DPHI, 0, DPHI]
     DPHISS = []
     for dphi0 in DPHIS:
-        _DPHIS = np.zeros(8)
+        _DPHIS = np.zeros(NJ * 2)
         _DPHIS[0] = phis[0] + dphi0
         for dphi1 in DPHIS:
             _DPHIS[1] = phis[1] + dphi1
@@ -85,6 +85,7 @@ if __name__ == "__main__":
                 print("desired_cam_v %s, desired_cam_p %s" % (desired_cam_v, desired_cam_p))
 
         r.step(phis)
+        r.updateQ()
 
         def get_best_phis():
             best_phis = None
@@ -99,7 +100,7 @@ if __name__ == "__main__":
 
                 err_p = np.linalg.norm(cam_p - desired_cam_p)
                 err_v = np.dot(desired_cam_v, cam_v)
-                err = err_p - err_v
+                err = err_p * 0.1 - err_v
 
                 #print("# phis %s => err %f" % (other_phis, err))
                 if best_err is None or err < best_err:
@@ -107,7 +108,7 @@ if __name__ == "__main__":
                     best_err = err
                     best_err_ = (err_p, err_v)
 
-            print("BEST err %s" % (best_err_,))
+            print("err %s" % (best_err_,))
             #print("%s %s err %s | %s %s" % (desired_cam_v, cam_v, best_err, phis, best_phis))
 
             return best_phis

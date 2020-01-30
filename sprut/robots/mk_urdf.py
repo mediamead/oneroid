@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sprut
+import sprut_robot
 
 class URDFPrinter():
   header = """
@@ -126,7 +126,7 @@ class URDFPrinter():
     print(self.manipulator_base_template % {"base_name": self.base_name}, file=f)
 
     JD = 0.05
-    NJ = sprut.NJ * sprut.NP
+    NJ = sprut_robot.NJ * sprut_robot.NP
     for i in range(NJ):
       if i > 0:
         parent = "Plate%d" % (i-1)
