@@ -35,7 +35,7 @@ class Robot:
         # load urdf and set gravity
         p.resetSimulation()
 
-        #self._loadBody("plane.urdf", [0, 0, 3], [0, np.pi, 0])
+        self._loadBody("plane.urdf", [0, 0, 0], [0, 0, 0])
 
         self.bodyId = self._loadBody("manipulator.urdf")
         assert(p.getNumJoints(self.bodyId) == NJ * NP * 2 + 1)
