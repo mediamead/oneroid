@@ -29,24 +29,29 @@ if __name__ == "__main__":
     desired_cam_z0 = None
 
     phis = np.zeros(NJ * 2)
-    DPHI = np.pi / 180 * 1 # half degree steps
+    DPHI = np.pi / 180 # one degree steps
 
     DPHIS = [-DPHI, 0, DPHI]
     DPHISS = []
     for dphi0 in DPHIS:
         _DPHIS = np.zeros(NJ * 2)
-        _DPHIS[0] = phis[0] + dphi0
+        _DPHIS[0] = phis[0] + dphi0/2
+        _DPHIS[2] = phis[2] + dphi0/2
         for dphi1 in DPHIS:
-            _DPHIS[1] = phis[1] + dphi1
-            for dphi2 in DPHIS:
-                _DPHIS[2] = phis[2] + dphi2
-                for dphi3 in DPHIS:
-                    _DPHIS[3] = phis[3] + dphi3
-                    DPHISS.append(np.copy(_DPHIS))
-                    for dphi4 in DPHIS:
-                        _DPHIS[4] = phis[4] + dphi4
-                        for dphi5 in DPHIS:
-                            _DPHIS[5] = phis[5] + dphi5
+            _DPHIS[1] = phis[1] + dphi1/2
+            _DPHIS[3] = phis[3] + dphi1/2
+    #        for dphi2 in DPHIS:
+    #            _DPHIS[2] = phis[2] + dphi2
+    #            for dphi3 in DPHIS:
+    #                _DPHIS[3] = phis[3] + dphi3
+            for dphi4 in DPHIS:
+                _DPHIS[4] = phis[4] + dphi4
+                for dphi5 in DPHIS:
+                    _DPHIS[5] = phis[5] + dphi5
+                    for dphi6 in DPHIS:
+                        _DPHIS[6] = phis[6] + dphi6
+                        for dphi7 in DPHIS:
+                            _DPHIS[7] = phis[7] + dphi7
                             DPHISS.append(np.copy(_DPHIS))
     #print(DPHISS)
 
