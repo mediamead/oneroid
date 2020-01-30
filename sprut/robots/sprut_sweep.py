@@ -11,12 +11,15 @@ if __name__ == "__main__":
     LOGFILE = "sweep"
     #logX = open("%s-x.txt" % LOGFILE, "w")
     #logY = open("%s-y.txt" % LOGFILE, "w")
-    logXY = open("%s-xy.txt" % LOGFILE, "w")
+    #logXY = open("%s.xy.txt" % LOGFILE, "w")
+
+    dphi = 0.033
+    logXY = open("%s.xy-%f.txt" % (LOGFILE, dphi), "w")
 
     gui = False
     r = sprut.Robot(render=gui)
 
-    phi_values = np.arange(-np.pi/4, np.pi/4, 0.06)
+    phi_values = np.arange(-np.pi/4, np.pi/4, dphi)
     phis = np.zeros(sprut.NJ * 2)
     for t_phi in phi_values:
         TR = 3
