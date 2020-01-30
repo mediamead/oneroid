@@ -93,19 +93,23 @@ class Robot:
         rot_matrix = np.array(rot_matrix).reshape(3, 3)
         # Initial vectors
         init_camera_vector = (0, 0, 1)  # z-axis
-        init_up_vector = (1, 0, 0)  # x-axis
+        init_up_vector = (-1, 0, 0)  # x-axis
         # Rotated vectors
         camera_vector = rot_matrix.dot(init_camera_vector)
         up_vector = rot_matrix.dot(init_up_vector)
 
         return cam_p, camera_vector, up_vector
 
-    def getOffCenter(self):
+    def getCameraImage(self):
         (cam_p, camera_vector, up_vector) = self.getCamPVU()
         view_matrix = p.computeViewMatrix(
             cam_p, cam_p + 0.1 * camera_vector, up_vector)
         imgs = p.getCameraImage(W, H, view_matrix, self.projection_matrix)
         assert((W, H) == (imgs[0], imgs[1]))
+        return imgs
+
+    def getOffCenter(self):
+        imgs = self.getCameraImage()
         # get segmask
         segmask = imgs[4]
         segmask = np.reshape(segmask, (H, W))

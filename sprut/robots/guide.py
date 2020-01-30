@@ -2,8 +2,15 @@
 
 import pybullet as p
 import numpy as np
+#import cv2
 
-from sprut_robot import Robot, NJ
+from sprut_robot import Robot, NJ, H, W
+
+#import matplotlib.pyplot as plt
+#plt.ion()
+#img = [[0,] * H*2] * W*2
+#image = plt.imshow(img, interpolation='none', animated=True, label="blah")
+#ax = plt.gca()
 
 if __name__ == "__main__":
     #t = 0
@@ -20,6 +27,7 @@ if __name__ == "__main__":
     r.setTarget([1.5, 1.5, 1])
 
     if gui:
+        s_quit = p.addUserDebugParameter("quit", 0, 1, 0)
         s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, 0)
         s_cam_theta = p.addUserDebugParameter("cam_theta", -90, 90, 0)
         s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, 1)
@@ -55,7 +63,9 @@ if __name__ == "__main__":
                             DPHISS.append(np.copy(_DPHIS))
     #print(DPHISS)
 
-    while True:
+    r.step(phis)
+
+    while p.readUserDebugParameter(s_quit) == 0:
         pose_changed = False
         target_changed = False
 
@@ -89,9 +99,6 @@ if __name__ == "__main__":
 
                 print("desired_cam_v %s, desired_cam_p %s" % (desired_cam_v, desired_cam_p))
 
-        r.step(phis)
-        r.updateQ()
-
         def get_best_phis():
             best_phis = None
             best_err = None
@@ -119,13 +126,23 @@ if __name__ == "__main__":
             return best_phis
 
         phis = get_best_phis()
-        #import time
-        #time.sleep(0.5)
-        
+        r.step(phis)
+        r.getCameraImage()
 
+#        def showCamera():
+#            (w, h, rgba, _, _) = r.getCameraImage()
+#            rgba = np.reshape(rgba, (h, w, 4))
+#            np_img_arr = rgba * (1. / 255.)
+#            image.set_data(np_img_arr)
+#            ax.plot([0])
+#            plt.pause(0.01)
+#        showCamera()
+        
         #t += timeStep
         #print("t=%f oc=%s, qval=%f, done=%s" % (t, (r.dx, r.dy), r.qval, r.done))
 
         #print("%f %f" % (t, reward), file=logf)
 
     #logf.close()
+
+video_writer.release()
