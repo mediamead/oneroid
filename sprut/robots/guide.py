@@ -21,9 +21,10 @@ if __name__ == "__main__":
 
     if gui:
         s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, 0)
+        s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, 1)
 
     cam_phi0 = None
-    desired_cam_v = None
+    desired_cam_z0 = None
 
     phis = np.zeros(NJ * 2)
     #phis[0] = 0.75
@@ -37,11 +38,20 @@ if __name__ == "__main__":
             # place target where user tells us
             TR = 3
             cam_phi = p.readUserDebugParameter(s_cam_phi) / 180 * np.pi
-            if desired_cam_v is None or cam_phi != cam_phi0:
-                desired_cam_v = [np.sin(cam_phi), 0, np.cos(cam_phi)]
+            desired_cam_z = p.readUserDebugParameter(s_cam_z)
+
+            if cam_phi0 is None or cam_phi != cam_phi0:
+                desired_cam_v = [np.cos(cam_phi), np.sin(cam_phi), 0]
                 desired_cam_v = np.array(desired_cam_v)
                 cam_phi0 = cam_phi
-                #print("desired_cam_v %s" % desired_cam_v)
+                cam_changed = True
+
+            if desired_cam_z0 is None or desired_cam_z != desired_cam_z0:
+                desired_cam_z0 = desired_cam_z
+                cam_changed = True
+
+            if cam_changed:
+                print("desired_cam_v %s, desired_cam_z %f" % (desired_cam_v, desired_cam_z))
 
                 r.setTarget(desired_cam_v * TR)
                 do_step = True
@@ -57,8 +67,10 @@ if __name__ == "__main__":
 
             #print("=======================================================")
             other_phis = np.copy(phis)
-            for dphi in [-DPHI, 0, DPHI]:
-                other_phis[0] = phis[0] + dphi
+            for dphi0 in [-DPHI, 0, DPHI]:
+              other_phis[0] = phis[0] + dphi0
+              for dphi1 in [-DPHI, 0, DPHI]:
+                other_phis[1] = phis[1] + dphi1
 
                 r.step(other_phis)
                 cam_p, cam_v, cap_u = r.getCamPVU()
