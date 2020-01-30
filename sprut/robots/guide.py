@@ -31,6 +31,20 @@ if __name__ == "__main__":
     phis = np.zeros(NJ * 2)
     DPHI = np.pi / 180 * 0.5 # half degree steps
 
+    DPHIS = [-DPHI, 0, DPHI]
+    DPHISS = []
+    for dphi0 in DPHIS:
+        _DPHIS = np.zeros(8)
+        _DPHIS[0] = phis[0] + dphi0
+        for dphi1 in DPHIS:
+            _DPHIS[1] = phis[1] + dphi1
+            for dphi2 in DPHIS:
+                _DPHIS[2] = phis[2] + dphi2
+                for dphi3 in DPHIS:
+                    _DPHIS[3] = phis[3] + dphi3
+                    DPHISS.append(np.copy(_DPHIS))
+    print(DPHISS)
+
     while True:
         pose_changed = False
         target_changed = False
@@ -63,7 +77,7 @@ if __name__ == "__main__":
                 desired_cam_v = target - desired_cam_p
                 desired_cam_v /= np.linalg.norm(desired_cam_v)
 
-                print("desired_cam_v %s, desired_cam_z %s" % (desired_cam_v, desired_cam_p))
+                print("desired_cam_v %s, desired_cam_p %s" % (desired_cam_v, desired_cam_p))
 
         r.step(phis)
 
@@ -72,11 +86,8 @@ if __name__ == "__main__":
             best_err = None
 
             #print("=======================================================")
-            other_phis = np.copy(phis)
-            for dphi0 in [-DPHI, 0, DPHI]:
-              other_phis[0] = phis[0] + dphi0
-              for dphi1 in [-DPHI, 0, DPHI]:
-                other_phis[6] = phis[6] + dphi1
+            for dphis in DPHISS:
+                other_phis = phis + dphis
 
                 r.step(other_phis)
                 cam_p, cam_v, cap_u = r.getCamPVU()
