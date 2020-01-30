@@ -21,43 +21,49 @@ if __name__ == "__main__":
 
     if gui:
         s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, 0)
+        s_cam_theta = p.addUserDebugParameter("cam_theta", -90, 90, 0)
         s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, 1)
 
     cam_phi0 = None
+    cam_theta0 = None
     desired_cam_z0 = None
 
     phis = np.zeros(NJ * 2)
-    #phis[0] = 0.75
-    #phis[1] = 0.5
     DPHI = np.pi / 180 * 0.5 # half degree steps
 
     while True:
-        do_step = False
+        pose_changed = False
+        target_changed = False
 
         if gui:
             # place target where user tells us
             TR = 3
             cam_phi = p.readUserDebugParameter(s_cam_phi) / 180 * np.pi
+            cam_theta = p.readUserDebugParameter(s_cam_theta) / 180 * np.pi
             desired_cam_z = p.readUserDebugParameter(s_cam_z)
-
-            if cam_phi0 is None or cam_phi != cam_phi0:
-                desired_cam_v = [np.cos(cam_phi), np.sin(cam_phi), 0]
-                desired_cam_v = np.array(desired_cam_v)
-                cam_phi0 = cam_phi
-                cam_changed = True
 
             if desired_cam_z0 is None or desired_cam_z != desired_cam_z0:
                 desired_cam_z0 = desired_cam_z
-                cam_changed = True
+                desired_cam_p = np.array([0, 0, desired_cam_z]) ## HEAD POSITION
+                pose_changed = True
 
-            if cam_changed:
-                print("desired_cam_v %s, desired_cam_z %f" % (desired_cam_v, desired_cam_z))
+            if (cam_phi0 is None) or (cam_theta0 is None) or (cam_phi != cam_phi0) or (cam_theta != cam_theta0):
+                cam_phi0 = cam_phi
+                cam_theta0 = cam_theta
+                #desired_cam_v = np.array([np.cos(cam_phi), np.sin(cam_phi), 0]) # XY plane
+                #desired_cam_v = np.array([np.sin(cam_phi), 0, np.cos(cam_phi)]) # ZX plane
+                t_x = np.sin(cam_phi)*np.cos(cam_theta)
+                t_y = np.sin(cam_phi)*np.sin(cam_theta)
+                t_z = np.cos(cam_phi)
+                target = np.array([t_x, t_y, t_z]) * TR
+                r.setTarget(target)
+                target_changed = True
 
-                r.setTarget(desired_cam_v * TR)
-                do_step = True
+            if pose_changed or target_changed:
+                desired_cam_v = target - desired_cam_p
+                desired_cam_v /= np.linalg.norm(desired_cam_v)
 
-        #if not do_step:
-        #    continue
+                print("desired_cam_v %s, desired_cam_z %s" % (desired_cam_v, desired_cam_p))
 
         r.step(phis)
 
@@ -70,14 +76,18 @@ if __name__ == "__main__":
             for dphi0 in [-DPHI, 0, DPHI]:
               other_phis[0] = phis[0] + dphi0
               for dphi1 in [-DPHI, 0, DPHI]:
-                other_phis[1] = phis[1] + dphi1
+                other_phis[6] = phis[6] + dphi1
 
                 r.step(other_phis)
                 cam_p, cam_v, cap_u = r.getCamPVU()
-                err = np.dot(desired_cam_v, cam_v)
+
+                err_p = np.linalg.norm(cam_p - desired_cam_p)
+                err_v = np.dot(desired_cam_v, cam_v)
+                #err = err_p - err_v
+                err = err_p*0.1 - err_v
 
                 #print("# phis %s => err %f" % (other_phis, err))
-                if best_err is None or err > best_err:
+                if best_err is None or err < best_err:
                     best_phis = np.copy(other_phis)
                     best_err = err
 
