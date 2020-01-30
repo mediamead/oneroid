@@ -86,7 +86,7 @@ class Robot:
 
 # --------------------------------------------------------------------
 
-    def getOffCenter(self):
+    def getCamPVU(self):
         # Center of mass position and orientation of the camera box
         cam_p, cam_o, _, _, _, _ = p.getLinkState(self.bodyId, self.cameraLinkId)
         rot_matrix = p.getMatrixFromQuaternion(cam_o)
@@ -97,6 +97,11 @@ class Robot:
         # Rotated vectors
         camera_vector = rot_matrix.dot(init_camera_vector)
         up_vector = rot_matrix.dot(init_up_vector)
+
+        return cam_p, camera_vector, up_vector
+
+    def getOffCenter(self):
+        (cam_p, camera_vector, up_vector) = self.getCamPVU()
         view_matrix = p.computeViewMatrix(
             cam_p, cam_p + 0.1 * camera_vector, up_vector)
         imgs = p.getCameraImage(W, H, view_matrix, self.projection_matrix)
@@ -129,7 +134,7 @@ class Robot:
     #         print("%4.3f " % (js[0]), end="")
     #     print()
     #
-    def update(self):
+    def updateQ(self):
         oc = self.getOffCenter()
         if oc is not None:
             self.target_found = True
@@ -162,7 +167,6 @@ class Robot:
         for i in range(NJ):
             self._setJointPosition(i, phis[i*2], phis[i*2+1])
         p.stepSimulation()
-        self.update()
 
         #t += timeStep
         #print("%.2f" % t)
