@@ -29,7 +29,7 @@ if __name__ == "__main__":
     desired_cam_z0 = None
 
     phis = np.zeros(NJ * 2)
-    DPHI = np.pi / 180 * 0.5 # half degree steps
+    DPHI = np.pi / 180 * 1 # half degree steps
 
     DPHIS = [-DPHI, 0, DPHI]
     DPHISS = []
@@ -43,7 +43,12 @@ if __name__ == "__main__":
                 for dphi3 in DPHIS:
                     _DPHIS[3] = phis[3] + dphi3
                     DPHISS.append(np.copy(_DPHIS))
-    print(DPHISS)
+                    for dphi4 in DPHIS:
+                        _DPHIS[4] = phis[4] + dphi4
+                        for dphi5 in DPHIS:
+                            _DPHIS[5] = phis[5] + dphi5
+                            DPHISS.append(np.copy(_DPHIS))
+    #print(DPHISS)
 
     while True:
         pose_changed = False
@@ -94,15 +99,15 @@ if __name__ == "__main__":
 
                 err_p = np.linalg.norm(cam_p - desired_cam_p)
                 err_v = np.dot(desired_cam_v, cam_v)
-                #err = err_p - err_v
-                err = err_p*0.1 - err_v
+                err = err_p - err_v
 
                 #print("# phis %s => err %f" % (other_phis, err))
                 if best_err is None or err < best_err:
                     best_phis = np.copy(other_phis)
                     best_err = err
+                    best_err_ = (err_p, err_v)
 
-            #print("BEST phis %s err %f" % (best_phis, best_err))
+            print("BEST err %s" % (best_err_,))
             #print("%s %s err %s | %s %s" % (desired_cam_v, cam_v, best_err, phis, best_phis))
 
             return best_phis
