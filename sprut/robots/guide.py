@@ -2,7 +2,9 @@
 
 import pybullet as p
 import numpy as np
-#import cv2
+
+import cv2
+import matplotlib.pyplot as plt
 
 from sprut_robot import Robot, NJ, H, W
 
@@ -10,10 +12,10 @@ TR = 3
 
 if __name__ == "__main__":
     gui = False
-    gui2 = True
+    gui2 = False
 
     #t = 0
-    #sps = 240
+    sps = 240
     #timeStep = 1./sps # default Bullet's timestep
 
     #LOGFILE = "log10s.txt"
@@ -23,6 +25,8 @@ if __name__ == "__main__":
     DESIRED_CAM_PHI = 45
     DESIRED_CAM_THETA = 0
 
+    r = Robot(render=gui)
+
     if gui:
         s_quit = p.addUserDebugParameter("quit", 0, 1, 0)
         s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, DESIRED_CAM_PHI)
@@ -30,13 +34,16 @@ if __name__ == "__main__":
         s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, DESIRED_CAM_Z)
 
     if gui2:
-        import matplotlib.pyplot as plt
         plt.ion()
         img = [[0,] * H*2] * W*2
         image = plt.imshow(img, interpolation='none', animated=True, label="blah")
         ax = plt.gca()
-
-    r = Robot(render=gui)
+    
+    if True:
+        fourcc = cv2.VideoWriter_fourcc(*'MP42')
+        vout = cv2.VideoWriter('guide.avi', fourcc, sps/10, (W, H))
+    else:
+        vout = None
 
     # Target and manipulator are both NNE
     r.setTarget([1.5, 1.5, 1])
@@ -133,25 +140,33 @@ if __name__ == "__main__":
                     best_err = err
                     best_err_ = (err_b, err_v)
 
-            print("err %s" % (best_err_,))
+            print("err %f (%s)" % (best_err, best_err_))
             #print("%s %s err %s | %s %s" % (desired_cam_v, cam_v, best_err, phis, best_phis))
 
-            return best_phis
+            return best_phis, best_err
 
-        phis = get_best_phis()
+        phis, err = get_best_phis()
         r.step(phis)
 
-        if gui or gui2:
+        if gui or gui2 or vout:
             imgs = r.getCameraImage()
 
+        if gui2 or vout is not None:
+            #(w, h, rgba, _, _) = imgs
+            rgba = np.reshape(imgs[2], (H, W, 4)).astype(np.uint8)
+
         if gui2:
-            (w, h, rgba, _, _) = imgs
-            rgba = np.reshape(rgba, (h, w, 4))
-            np_img_arr = rgba * (1. / 255.)
-            image.set_data(np_img_arr)
+            image.set_data(rgba)
             ax.plot([0])
             plt.pause(0.01)
-        
+
+        if vout is not None:
+            img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
+            vout.write(img)
+
+        if err < -0.99:
+            break
+
         #t += timeStep
         #print("t=%f oc=%s, qval=%f, done=%s" % (t, (r.dx, r.dy), r.qval, r.done))
 
@@ -159,4 +174,5 @@ if __name__ == "__main__":
 
     #logf.close()
 
-video_writer.release()
+if vout is not None:
+    vout.release()
