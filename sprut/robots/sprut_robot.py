@@ -131,6 +131,14 @@ class Robot:
         else:
             return None
 
+    def getImbalance(self):
+        R = np.zeros(2)
+        for i in range(p.getNumJoints(self.bodyId)):
+            r = p.getLinkState(self.bodyId, i)[0] # linkWorldPosition
+            #n = p.getJointInfo(self.bodyId, i)[12].decode('UTF-8')
+            R += [r[0], r[1]] # take only XJ proj
+        return np.linalg.norm(R)
+
     # def _print_joints_pos(self):
     #     for i in range(p.getNumJoints(self.bodyId)):
     #         js = p.getJointState(self.bodyId, i)

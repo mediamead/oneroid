@@ -108,17 +108,18 @@ if __name__ == "__main__":
                 other_phis = phis + dphis
 
                 r.step(other_phis)
-                cam_p, cam_v, cap_u = r.getCamPVU()
+                cam_p, cam_v, _cap_u = r.getCamPVU()
 
-                err_p = np.linalg.norm(cam_p - desired_cam_p)
+                err_b = r.getImbalance()
+                #err_p = np.linalg.norm(cam_p - desired_cam_p)
                 err_v = np.dot(desired_cam_v, cam_v)
-                err = err_p * 0.1 - err_v
+                err = err_b - err_v
 
                 #print("# phis %s => err %f" % (other_phis, err))
                 if best_err is None or err < best_err:
                     best_phis = np.copy(other_phis)
                     best_err = err
-                    best_err_ = (err_p, err_v)
+                    best_err_ = (err_b, err_v)
 
             print("err %s" % (best_err_,))
             #print("%s %s err %s | %s %s" % (desired_cam_v, cam_v, best_err, phis, best_phis))

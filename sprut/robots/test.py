@@ -62,11 +62,14 @@ if __name__ == "__main__":
 
         r.step(phis)
         
-        cam_p, cam_v, _cap_u = r.getCamPVU()
-        print("cam_p %s, cam_v %s" % (cam_p, cam_v))
+        imb = r.getImbalance()
+        print("imb %s" % imb)
 
-        r.updateQ()
-        print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
+        #cam_p, cam_v, _cap_u = r.getCamPVU()
+        #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
+
+        #r.updateQ()
+        #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
 
         #print("%f %f" % (t, reward), file=logf)
 
