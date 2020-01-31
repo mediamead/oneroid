@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 err_b = r.getImbalance()
                 #err_p = np.linalg.norm(cam_p - desired_cam_p)
                 err_v = np.dot(desired_cam_v, cam_v)
-                err = err_b - err_v
+                err = err_b * 0.1 - err_v
 
                 #print("# phis %s => err %f" % (other_phis, err))
                 if best_err is None or err < best_err:
