@@ -5,6 +5,8 @@ import time
 import pybullet_data
 import numpy as np
 
+import cv2
+
 NP = 4 # number of plates per section
 NJ = 4 # number of sections
 
@@ -106,7 +108,11 @@ class Robot:
             cam_p, cam_p + 0.1 * camera_vector, up_vector)
         imgs = p.getCameraImage(W, H, view_matrix, self.projection_matrix)
         assert((W, H) == (imgs[0], imgs[1]))
-        return imgs
+
+        rgba = np.reshape(imgs[2], (H, W, 4)).astype(np.uint8)
+        img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
+
+        return img
 
     def getOffCenter(self):
         imgs = self.getCameraImage()

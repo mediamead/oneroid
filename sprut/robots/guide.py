@@ -143,12 +143,11 @@ if __name__ == "__main__":
         r.step(phis)
 
         if gui is not None or gui2 is not None or vout is not None:
-            imgs = r.getCameraImage()
+            img = r.getCameraImage()
 
         if gui2 is not None or vout is not None:
-            rgba = np.reshape(imgs[2], (H, W, 4)).astype(np.uint8)
-            img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
             imgX = imgY = imgZ = img
+
             img = np.concatenate((
                 np.concatenate((img, imgX), axis=1),
                 np.concatenate((imgY, imgZ), axis=1)
