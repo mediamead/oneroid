@@ -6,27 +6,18 @@ import numpy as np
 
 from sprut_robot import Robot, NJ, H, W
 
-#import matplotlib.pyplot as plt
-#plt.ion()
-#img = [[0,] * H*2] * W*2
-#image = plt.imshow(img, interpolation='none', animated=True, label="blah")
-#ax = plt.gca()
-
 TR = 3
 
 if __name__ == "__main__":
+    gui = False
+    gui2 = True
+
     #t = 0
     #sps = 240
     #timeStep = 1./sps # default Bullet's timestep
 
     #LOGFILE = "log10s.txt"
     #logf = open(LOGFILE, "w")
-
-    gui = True
-    r = Robot(render=gui)
-
-    # Target and manipulator are both NNE
-    r.setTarget([1.5, 1.5, 1])
 
     DESIRED_CAM_Z = 1
     DESIRED_CAM_PHI = 45
@@ -37,6 +28,18 @@ if __name__ == "__main__":
         s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, DESIRED_CAM_PHI)
         s_cam_theta = p.addUserDebugParameter("cam_theta", -90, 90, DESIRED_CAM_THETA)
         s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, DESIRED_CAM_Z)
+
+    if gui2:
+        import matplotlib.pyplot as plt
+        plt.ion()
+        img = [[0,] * H*2] * W*2
+        image = plt.imshow(img, interpolation='none', animated=True, label="blah")
+        ax = plt.gca()
+
+    r = Robot(render=gui)
+
+    # Target and manipulator are both NNE
+    r.setTarget([1.5, 1.5, 1])
 
     cam_phi0 = None
     cam_theta0 = None
@@ -138,17 +141,16 @@ if __name__ == "__main__":
         phis = get_best_phis()
         r.step(phis)
 
-        if gui:
-            r.getCameraImage()
+        if gui or gui2:
+            imgs = r.getCameraImage()
 
-#        def showCamera():
-#            (w, h, rgba, _, _) = r.getCameraImage()
-#            rgba = np.reshape(rgba, (h, w, 4))
-#            np_img_arr = rgba * (1. / 255.)
-#            image.set_data(np_img_arr)
-#            ax.plot([0])
-#            plt.pause(0.01)
-#        showCamera()
+        if gui2:
+            (w, h, rgba, _, _) = imgs
+            rgba = np.reshape(rgba, (h, w, 4))
+            np_img_arr = rgba * (1. / 255.)
+            image.set_data(np_img_arr)
+            ax.plot([0])
+            plt.pause(0.01)
         
         #t += timeStep
         #print("t=%f oc=%s, qval=%f, done=%s" % (t, (r.dx, r.dy), r.qval, r.done))
