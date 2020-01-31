@@ -10,8 +10,8 @@ import cv2
 NP = 4 # number of plates per section
 NJ = 4 # number of sections
 
-H = 200
-W = 200
+H = 400
+W = 400
 
 import os
 
@@ -88,7 +88,7 @@ class Robot:
 
 # --------------------------------------------------------------------
 
-    def getCamPVU(self):
+    def getHeadcamPVU(self):
         # Center of mass position and orientation of the camera box
         cam_p, cam_o, _, _, _, _ = p.getLinkState(self.bodyId, self.cameraLinkId)
         rot_matrix = p.getMatrixFromQuaternion(cam_o)
@@ -102,8 +102,18 @@ class Robot:
 
         return cam_p, camera_vector, up_vector
 
-    def getCameraImage(self):
-        (cam_p, camera_vector, up_vector) = self.getCamPVU()
+    def getCameraImage(self, pvu=None):
+        """
+        Get image given Position, Vector, and Up
+        """
+        if pvu is None:
+            pvu = self.getHeadcamPVU()
+            (cam_p, camera_vector, up_vector) = pvu
+        else:
+            cam_p = np.array(pvu[0])
+            camera_vector = np.array(pvu[1])
+            up_vector = np.array(pvu[2])
+
         view_matrix = p.computeViewMatrix(
             cam_p, cam_p + 0.1 * camera_vector, up_vector)
         imgs = p.getCameraImage(W, H, view_matrix, self.projection_matrix)
@@ -114,28 +124,28 @@ class Robot:
 
         return img
 
-    def getOffCenter(self):
-        imgs = self.getCameraImage()
-        # get segmask
-        segmask = imgs[4]
-        segmask = np.reshape(segmask, (H, W))
-        # ---
-        # find center mass and mass of the target
-        x = y = m = 0
-        for i in range(H):
-            for j in range(W):
-                if segmask[i][j] == self.targetId:
-                    x += j
-                    y += i
-                    m += 1
-        if m > 0:
-            # map to (-1, 1) range
-            dx = 1. - 2.*x/m/W
-            dy = 1. - 2.*y/m/H
-            #dr = np.sqrt(dx**2 + dy**2)
-            return (dx, dy)
-        else:
-            return None
+    # def getOffCenter(self):
+    #     imgs = self.getCameraImage()
+    #     # get segmask
+    #     segmask = imgs[4]
+    #     segmask = np.reshape(segmask, (H, W))
+    #     # ---
+    #     # find center mass and mass of the target
+    #     x = y = m = 0
+    #     for i in range(H):
+    #         for j in range(W):
+    #             if segmask[i][j] == self.targetId:
+    #                 x += j
+    #                 y += i
+    #                 m += 1
+    #     if m > 0:
+    #         # map to (-1, 1) range
+    #         dx = 1. - 2.*x/m/W
+    #         dy = 1. - 2.*y/m/H
+    #         #dr = np.sqrt(dx**2 + dy**2)
+    #         return (dx, dy)
+    #     else:
+    #         return None
 
     def getImbalance(self):
         R = np.zeros(2)
@@ -152,30 +162,30 @@ class Robot:
     #         print("%4.3f " % (js[0]), end="")
     #     print()
     #
-    def updateQ(self):
-        oc = self.getOffCenter()
-        if oc is not None:
-            self.target_found = True
-            (dx, dy) = oc
-            dr = np.sqrt(dx**2+dy**2)
+    # def updateQ(self):
+    #     oc = self.getOffCenter()
+    #     if oc is not None:
+    #         self.target_found = True
+    #         (dx, dy) = oc
+    #         dr = np.sqrt(dx**2+dy**2)
 
-            if dr < 0.02:
-                qval = 10
-                done = True
-            else:
-                qval = 0
-                done = False
-        else:
-            self.target_found = False
-            qval = -100
-            done = True
-            dx = dy = dr = 0
+    #         if dr < 0.02:
+    #             qval = 10
+    #             done = True
+    #         else:
+    #             qval = 0
+    #             done = False
+    #     else:
+    #         self.target_found = False
+    #         qval = -100
+    #         done = True
+    #         dx = dy = dr = 0
 
-        self.qval = qval
-        self.done = done
-        self.dx = dx
-        self.dy = dy
-        self.dr = dr
+    #     self.qval = qval
+    #     self.done = done
+    #     self.dx = dx
+    #     self.dy = dy
+    #     self.dr = dr
 
     def get_nphis(self):
         return NJ

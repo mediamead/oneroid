@@ -11,7 +11,7 @@ from sprut_robot import Robot, NJ, H, W
 TR = 3
 
 if __name__ == "__main__":
-    gui = False
+    gui = True
     gui2 = True
 
     #t = 0
@@ -121,7 +121,7 @@ if __name__ == "__main__":
                 other_phis = phis + dphis
 
                 r.step(other_phis)
-                cam_p, cam_v, _cap_u = r.getCamPVU()
+                cam_p, cam_v, _cap_u = r.getHeadcamPVU()
 
                 err_b = r.getImbalance()
                 #err_p = np.linalg.norm(cam_p - desired_cam_p)
@@ -146,7 +146,9 @@ if __name__ == "__main__":
             img = r.getCameraImage()
 
         if gui2 is not None or vout is not None:
-            imgX = imgY = imgZ = img
+            imgX = r.getCameraImage(([2, 0, 1], [-1, 0, 0], [0, 0, 1])) # X
+            imgY = r.getCameraImage(([0, 2, 1], [0, -1, 0], [0, 0, 1])) # Y
+            imgZ = r.getCameraImage(([0, 0, 4], [0, 0, -1], [1, 0, 0])) # Z
 
             img = np.concatenate((
                 np.concatenate((img, imgX), axis=1),
