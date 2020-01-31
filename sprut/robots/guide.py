@@ -12,7 +12,7 @@ TR = 3
 
 if __name__ == "__main__":
     gui = False
-    gui2 = False
+    gui2 = True
 
     #t = 0
     sps = 240
@@ -32,16 +32,10 @@ if __name__ == "__main__":
         s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, DESIRED_CAM_PHI)
         s_cam_theta = p.addUserDebugParameter("cam_theta", -90, 90, DESIRED_CAM_THETA)
         s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, DESIRED_CAM_Z)
-
-    if gui2:
-        plt.ion()
-        img = [[0,] * H*2] * W*2
-        image = plt.imshow(img, interpolation='none', animated=True, label="blah")
-        ax = plt.gca()
     
     if True:
         fourcc = cv2.VideoWriter_fourcc(*'MP42')
-        vout = cv2.VideoWriter('guide.avi', fourcc, sps/10, (W, H))
+        vout = cv2.VideoWriter('guide.avi', fourcc, sps/10, (W*2, H*2))
     else:
         vout = None
 
@@ -148,20 +142,23 @@ if __name__ == "__main__":
         phis, err = get_best_phis()
         r.step(phis)
 
-        if gui or gui2 or vout:
+        if gui is not None or gui2 is not None or vout is not None:
             imgs = r.getCameraImage()
 
-        if gui2 or vout is not None:
-            #(w, h, rgba, _, _) = imgs
+        if gui2 is not None or vout is not None:
             rgba = np.reshape(imgs[2], (H, W, 4)).astype(np.uint8)
+            img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
+            imgX = imgY = imgZ = img
+            img = np.concatenate((
+                np.concatenate((img, imgX), axis=1),
+                np.concatenate((imgY, imgZ), axis=1)
+            ), axis=0)
 
         if gui2:
-            image.set_data(rgba)
-            ax.plot([0])
-            plt.pause(0.01)
+            cv2.imshow("img", img)
+            cv2.waitKey(1)
 
         if vout is not None:
-            img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
             vout.write(img)
 
         if err < -0.99:
