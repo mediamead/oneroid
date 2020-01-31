@@ -12,6 +12,8 @@ from sprut_robot import Robot, NJ, H, W
 #image = plt.imshow(img, interpolation='none', animated=True, label="blah")
 #ax = plt.gca()
 
+TR = 3
+
 if __name__ == "__main__":
     #t = 0
     #sps = 240
@@ -26,11 +28,15 @@ if __name__ == "__main__":
     # Target and manipulator are both NNE
     r.setTarget([1.5, 1.5, 1])
 
+    DESIRED_CAM_Z = 1
+    DESIRED_CAM_PHI = 45
+    DESIRED_CAM_THETA = 0
+
     if gui:
         s_quit = p.addUserDebugParameter("quit", 0, 1, 0)
-        s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, 0)
-        s_cam_theta = p.addUserDebugParameter("cam_theta", -90, 90, 0)
-        s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, 1)
+        s_cam_phi = p.addUserDebugParameter("cam_phi", -90, 90, DESIRED_CAM_PHI)
+        s_cam_theta = p.addUserDebugParameter("cam_theta", -90, 90, DESIRED_CAM_THETA)
+        s_cam_z = p.addUserDebugParameter("cam_z", 0, 3, DESIRED_CAM_Z)
 
     cam_phi0 = None
     cam_theta0 = None
@@ -65,39 +71,42 @@ if __name__ == "__main__":
 
     r.step(phis)
 
-    while p.readUserDebugParameter(s_quit) == 0:
+    while not gui or (p.readUserDebugParameter(s_quit) == 0):
         pose_changed = False
         target_changed = False
 
         if gui:
             # place target where user tells us
-            TR = 3
             cam_phi = p.readUserDebugParameter(s_cam_phi) / 180 * np.pi
             cam_theta = p.readUserDebugParameter(s_cam_theta) / 180 * np.pi
             desired_cam_z = p.readUserDebugParameter(s_cam_z)
+        else:
+            cam_phi = DESIRED_CAM_PHI
+            cam_theta = DESIRED_CAM_THETA
+            desired_cam_z = DESIRED_CAM_Z
 
-            if desired_cam_z0 is None or desired_cam_z != desired_cam_z0:
-                desired_cam_z0 = desired_cam_z
-                desired_cam_p = np.array([0, 0, desired_cam_z]) ## HEAD POSITION
-                pose_changed = True
+        if desired_cam_z0 is None or desired_cam_z != desired_cam_z0:
+            desired_cam_z0 = desired_cam_z
+            desired_cam_p = np.array([0, 0, desired_cam_z]) ## HEAD POSITION
+            pose_changed = True
 
-            if (cam_phi0 is None) or (cam_theta0 is None) or (cam_phi != cam_phi0) or (cam_theta != cam_theta0):
-                cam_phi0 = cam_phi
-                cam_theta0 = cam_theta
-                #desired_cam_v = np.array([np.cos(cam_phi), np.sin(cam_phi), 0]) # XY plane
-                #desired_cam_v = np.array([np.sin(cam_phi), 0, np.cos(cam_phi)]) # ZX plane
-                t_x = np.sin(cam_phi)*np.cos(cam_theta)
-                t_y = np.sin(cam_phi)*np.sin(cam_theta)
-                t_z = np.cos(cam_phi)
-                target = np.array([t_x, t_y, t_z]) * TR
-                r.setTarget(target)
-                target_changed = True
+        if (cam_phi0 is None) or (cam_theta0 is None) or (cam_phi != cam_phi0) or (cam_theta != cam_theta0):
+            cam_phi0 = cam_phi
+            cam_theta0 = cam_theta
+            #desired_cam_v = np.array([np.cos(cam_phi), np.sin(cam_phi), 0]) # XY plane
+            #desired_cam_v = np.array([np.sin(cam_phi), 0, np.cos(cam_phi)]) # ZX plane
+            t_x = np.sin(cam_phi)*np.cos(cam_theta)
+            t_y = np.sin(cam_phi)*np.sin(cam_theta)
+            t_z = np.cos(cam_phi)
+            target = np.array([t_x, t_y, t_z]) * TR
+            r.setTarget(target)
+            target_changed = True
 
-            if pose_changed or target_changed:
-                desired_cam_v = target - desired_cam_p
-                desired_cam_v /= np.linalg.norm(desired_cam_v)
+        if pose_changed or target_changed:
+            desired_cam_v = target - desired_cam_p
+            desired_cam_v /= np.linalg.norm(desired_cam_v)
 
-                print("desired_cam_v %s, desired_cam_p %s" % (desired_cam_v, desired_cam_p))
+            print("desired_cam_v %s, desired_cam_p %s" % (desired_cam_v, desired_cam_p))
 
         def get_best_phis():
             best_phis = None
@@ -128,7 +137,9 @@ if __name__ == "__main__":
 
         phis = get_best_phis()
         r.step(phis)
-        r.getCameraImage()
+
+        if gui:
+            r.getCameraImage()
 
 #        def showCamera():
 #            (w, h, rgba, _, _) = r.getCameraImage()
