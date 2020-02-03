@@ -33,13 +33,13 @@ class URDFPrinter():
       <mass value="100"/>
       <inertia ixx="9.3" ixy="0" ixz="0" iyy="9.3" iyz="0" izz="9.3"/>
     </inertial>
-    <visual>
+    <!-- visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <box size="1 1 0" />
       </geometry>
       <material name="Black"/>
-    </visual>
+    </visual -->
   </link>"""
 
   section_template = """
