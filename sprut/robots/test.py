@@ -68,7 +68,7 @@ if __name__ == "__main__":
         #cam_p, cam_v, _cap_u = r.getCamPVU()
         #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
 
-        #r.updateQ()
+        r.getCameraImage()
         #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
 
         #print("%f %f" % (t, reward), file=logf)
