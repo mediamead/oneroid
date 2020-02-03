@@ -134,7 +134,7 @@ class URDFPrinter():
         parent = self.base_name
 
       if (i + 1) % 4 == 0:
-        plate_color = "Orange"
+        plate_color = "Black"
       else:
         plate_color = "Grey"
 
@@ -163,7 +163,7 @@ class URDFPrinter():
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="%(size)f %(size)f %(size)f"/>
+        <sphere radius="%(size)f"/>
       </geometry>
       <material name="%(color)s"/>
     </visual>
@@ -172,8 +172,8 @@ class URDFPrinter():
   def print_manipulator_camera(self, f, parent_link):
     print(self.manipulator_camera_template % {
       "parent_link": parent_link,
-      "size": 0.2,
-      "camera_z": 0.1,
+      "size": 0.1,
+      "camera_z": 0.05,
       "color": "Red"
       }, file=f)
 
@@ -198,7 +198,7 @@ class URDFPrinter():
 """
 
   def print_target_body(self, f):
-    print(self.target_template % {"xyz": "1 1 1", "r": 0.05}, file=f)
+    print(self.target_template % {"xyz": "1 1 1", "r": 0.25}, file=f)
 
 p = URDFPrinter()
 p.print_manipulator(open("manipulator.urdf", "w"))

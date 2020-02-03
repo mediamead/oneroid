@@ -11,9 +11,9 @@ from sprut_robot import Robot, NJ, H, W
 TR = 3
 
 if __name__ == "__main__":
-    gui = True
+    gui = False
     gui2 = True
-    auto_retarget = True
+    auto_retarget = False
 
     #t = 0
     sps = 240
@@ -48,30 +48,29 @@ if __name__ == "__main__":
     target_theta0 = None
 
     phis = np.zeros(NJ * 2)
-    DPHI = np.pi / 180 # one degree steps
+    DPHI = (np.pi / 180) * 1 # steps size, in degrees
 
     DPHIS = [-DPHI, 0, DPHI]
     DPHISS = []
+
     for dphi0 in DPHIS:
         _DPHIS = np.zeros(NJ * 2)
-        _DPHIS[0] = phis[0] + dphi0/2
-        _DPHIS[2] = phis[2] + dphi0/2
+        _DPHIS[0] = phis[0] + dphi0
         for dphi1 in DPHIS:
-            _DPHIS[1] = phis[1] + dphi1/2
-            _DPHIS[3] = phis[3] + dphi1/2
-    #        for dphi2 in DPHIS:
-    #            _DPHIS[2] = phis[2] + dphi2
-    #            for dphi3 in DPHIS:
-    #                _DPHIS[3] = phis[3] + dphi3
-            for dphi4 in DPHIS:
-                _DPHIS[4] = phis[4] + dphi4
-                for dphi5 in DPHIS:
-                    _DPHIS[5] = phis[5] + dphi5
-                    for dphi6 in DPHIS:
-                        _DPHIS[6] = phis[6] + dphi6
-                        for dphi7 in DPHIS:
-                            _DPHIS[7] = phis[7] + dphi7
-                            DPHISS.append(np.copy(_DPHIS))
+            _DPHIS[1] = phis[1] + dphi1
+            for dphi2 in DPHIS:
+                _DPHIS[2] = phis[2] + dphi2
+                for dphi3 in DPHIS:
+                    _DPHIS[3] = phis[3] + dphi3
+                    for dphi4 in DPHIS:
+                        _DPHIS[4] = phis[4] + dphi4
+                        for dphi5 in DPHIS:
+                            _DPHIS[5] = phis[5] + dphi5
+                            for dphi6 in DPHIS:
+                                _DPHIS[6] = phis[6] + dphi6
+                                for dphi7 in DPHIS:
+                                    _DPHIS[7] = phis[7] + dphi7
+                                    DPHISS.append(np.copy(_DPHIS))
     #print(DPHISS)
 
     if not gui:
@@ -113,11 +112,11 @@ if __name__ == "__main__":
             target_phi = p.readUserDebugParameter(s_cam_phi) / 180 * np.pi
             target_theta = p.readUserDebugParameter(s_cam_theta) / 180 * np.pi
 
-        if auto_retarget and (err < -0.99):
+        if auto_retarget and (err < -0.97):
             # retarget
             print("retarget (err %f)" % err)
-            target_phi = np.random.uniform(low=-np.pi/2, high=np.pi/2)
-            target_theta = np.random.uniform(low=-np.pi/2, high=np.pi/2)
+            target_phi = np.random.uniform(low=np.pi/4, high=np.pi/3)
+            target_theta = np.random.uniform(low=0, high=np.pi/2)
 
         if (target_phi0 is None) or (target_theta0 is None) or (target_phi != target_phi0) or (target_theta != target_theta0):
             target_phi0 = target_phi
