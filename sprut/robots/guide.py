@@ -11,7 +11,7 @@ from sprut_robot import Robot, NJ, H, W
 TR = 3
 
 if __name__ == "__main__":
-    gui = False
+    gui = True
     gui2 = True
     auto_retarget = False
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
         target_theta = DESIRED_CAM_THETA
 
     if auto_retarget:
-        err = -1
+        err = None
 
     while not gui or (p.readUserDebugParameter(s_quit) == 0):
         # apply phis
@@ -100,8 +100,12 @@ if __name__ == "__main__":
 
         if gui2:
             cv2.imshow("img", img)
-            if cv2.waitKey(1) == ord('q'):
+            key = cv2.waitKey(1)
+            #print("WAITKEY=>%s<" % key)
+            if key == ord('q'):
                 break
+            elif key == ord(' '):
+                err = None
 
         if vout is not None:
             vout.write(img)
@@ -112,11 +116,11 @@ if __name__ == "__main__":
             target_phi = p.readUserDebugParameter(s_cam_phi) / 180 * np.pi
             target_theta = p.readUserDebugParameter(s_cam_theta) / 180 * np.pi
 
-        if auto_retarget and (err < -0.97):
+        if auto_retarget and (err is None or err[0] < -3.8):
             # retarget
-            print("retarget (err %f)" % err)
-            target_phi = np.random.uniform(low=np.pi/4, high=np.pi/3)
-            target_theta = np.random.uniform(low=0, high=np.pi/2)
+            target_phi = np.random.uniform(low=0, high=np.pi/2)
+            target_theta = np.random.uniform(low=np.pi/6, high=np.pi/3)
+            print("retargeted to %f/%f" % (target_phi, target_theta))
 
         if (target_phi0 is None) or (target_theta0 is None) or (target_phi != target_phi0) or (target_theta != target_theta0):
             target_phi0 = target_phi
@@ -124,7 +128,7 @@ if __name__ == "__main__":
             #desired_cam_v = np.array([np.cos(cam_phi), np.sin(cam_phi), 0]) # XY plane
             #desired_cam_v = np.array([np.sin(cam_phi), 0, np.cos(cam_phi)]) # ZX plane
             t_x = np.sin(target_phi)*np.cos(target_theta)
-            t_y = np.sin(target_phi)*np.sin(target_theta)
+            t_y = np.cos(target_phi)*np.sin(target_theta)
             t_z = np.cos(target_phi)
             target = np.array([t_x, t_y, t_z]) * TR
             r.setTarget(target)
@@ -143,25 +147,24 @@ if __name__ == "__main__":
                 other_phis = phis + dphis
 
                 r.step(other_phis)
-                cam_v = r.getHeadcamPVU()[1]
+                (cam_v, cam_u) = r.getHeadcamPVU()[1:3]
 
                 err_b = r.getImbalance()
+                err_u = np.dot([0,0,1], cam_u)
                 err_v = np.dot(desired_cam_v, cam_v)
-                err = err_b * 0.1 - err_v
+                err = err_b * 0.025 - err_v - 3*err_u
 
                 #print("# phis %s => err %f" % (other_phis, err))
-                if best_err is None or err < best_err:
+                if best_err is None or err < best_err[0]:
                     best_phis = np.copy(other_phis)
-                    best_err = err
-                    #best_err_ = (err_b, err_v)
+                    best_err = [err, err_b, err_v, err_u]
 
-            #print("err %f (%s)" % (best_err, best_err_))
+            print("best_err: %s" % (best_err))
             #print("%s %s err %s | %s %s" % (desired_cam_v, cam_v, best_err, phis, best_phis))
 
             return best_phis, best_err
 
         phis, err = get_best_phis()
-        print("err %f" % (err))
 
         #t += timeStep
         #print("t=%f oc=%s, qval=%f, done=%s" % (t, (r.dx, r.dy), r.qval, r.done))
