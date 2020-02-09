@@ -94,6 +94,46 @@ class URDFPrinter():
   footer = """
 </robot>"""
 
+  manipulator_camera_template = """
+  <joint name="Joint_Camera" type="fixed">
+    <parent link="%(parent_link)s"/>
+    <child link="CameraBox"/>
+    <origin rpy="0 0 0" xyz="0 0 %(camera_z)f"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="CameraBox">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="%(size)f"/>
+      </geometry>
+      <material name="%(color)s"/>
+    </visual>
+  </link>"""
+
+  target_template = """
+<link name="base_link">
+  <origin rpy="0 0 0" xyz="%(xyz)s"/>
+  <inertial>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <mass value="1"/>
+    <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <geometry>
+      <sphere radius="%(r)f"/>
+    </geometry>
+    <material name="Red"/>
+  </visual>
+</link>
+"""
+
   base_name = "SprutBase"
 
   def print_manipulator(self, f):
@@ -125,7 +165,7 @@ class URDFPrinter():
     """
     print(self.manipulator_base_template % {"base_name": self.base_name}, file=f)
 
-    JD = 0.05
+    JD = 0.028 # 4mm plate + 24mm to the axis
     NJ = sprut_robot.NJ * sprut_robot.NP
     for i in range(NJ):
       if i > 0:
@@ -140,62 +180,23 @@ class URDFPrinter():
 
       print(self.section_template % {
         'parent': parent, 'index': i,
-        'block_size': "0.05 0.05 0.025",
-        'plate_color': plate_color, 'plate_radius': 0.1,
+        'block_size': '0.023 0.023 0.005',
+        'plate_color': plate_color,
+        'plate_radius': 0.035,
         'joint_z': JD}, file=f)
 
     return "Plate%d" % (NJ-1)
 
-  manipulator_camera_template = """
-  <joint name="Joint_Camera" type="fixed">
-    <parent link="%(parent_link)s"/>
-    <child link="CameraBox"/>
-    <origin rpy="0 0 0" xyz="0 0 %(camera_z)f"/>
-    <axis xyz="0 0 1"/>
-  </joint>
-
-  <link name="CameraBox">
-    <inertial>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <mass value="1"/>
-      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
-    </inertial>
-    <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <sphere radius="%(size)f"/>
-      </geometry>
-      <material name="%(color)s"/>
-    </visual>
-  </link>"""
-
   def print_manipulator_camera(self, f, parent_link):
     print(self.manipulator_camera_template % {
       "parent_link": parent_link,
-      "size": 0.1,
-      "camera_z": 0.05,
-      "color": "Red"
+      "size": 0.035,
+      "camera_z": 0.035,
+      "color": "Black"
       }, file=f)
 
   def print_cage_body(self, f):
     print("<!-- fixme cage -->", file=f)
-
-  target_template = """
-<link name="base_link">
-  <origin rpy="0 0 0" xyz="%(xyz)s"/>
-  <inertial>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-    <mass value="1"/>
-    <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
-  </inertial>
-  <visual>
-    <geometry>
-      <sphere radius="%(r)f"/>
-    </geometry>
-    <material name="Red"/>
-  </visual>
-</link>
-"""
 
   def print_target_body(self, f):
     print(self.target_template % {"xyz": "1 1 1", "r": 0.25}, file=f)

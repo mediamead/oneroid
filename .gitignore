@@ -4,3 +4,4 @@ sprut/envs/__pycache__
 .vscode/.ropeproject
 tensorboard/
 sprut/robots/__pycache__
+.vscode/settings.json

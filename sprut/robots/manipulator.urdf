@@ -41,7 +41,7 @@
   <joint name="Joint_0a" type="revolute">
     <parent link="SprutBase"/>
     <child link="Block0"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -55,7 +55,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -64,7 +64,7 @@
   <joint name="Joint_0b" type="revolute">
     <parent link="Block0"/>
     <child link="Plate0"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -78,7 +78,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -89,7 +89,7 @@
   <joint name="Joint_1a" type="revolute">
     <parent link="Plate0"/>
     <child link="Block1"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -103,7 +103,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -112,7 +112,7 @@
   <joint name="Joint_1b" type="revolute">
     <parent link="Block1"/>
     <child link="Plate1"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -126,7 +126,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -137,7 +137,7 @@
   <joint name="Joint_2a" type="revolute">
     <parent link="Plate1"/>
     <child link="Block2"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -151,7 +151,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -160,7 +160,7 @@
   <joint name="Joint_2b" type="revolute">
     <parent link="Block2"/>
     <child link="Plate2"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -174,7 +174,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -185,7 +185,7 @@
   <joint name="Joint_3a" type="revolute">
     <parent link="Plate2"/>
     <child link="Block3"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -199,7 +199,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -208,7 +208,7 @@
   <joint name="Joint_3b" type="revolute">
     <parent link="Block3"/>
     <child link="Plate3"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -222,7 +222,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Black"/>
     </visual>
@@ -233,7 +233,7 @@
   <joint name="Joint_4a" type="revolute">
     <parent link="Plate3"/>
     <child link="Block4"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -247,7 +247,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -256,7 +256,7 @@
   <joint name="Joint_4b" type="revolute">
     <parent link="Block4"/>
     <child link="Plate4"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -270,7 +270,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -281,7 +281,7 @@
   <joint name="Joint_5a" type="revolute">
     <parent link="Plate4"/>
     <child link="Block5"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -295,7 +295,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -304,7 +304,7 @@
   <joint name="Joint_5b" type="revolute">
     <parent link="Block5"/>
     <child link="Plate5"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -318,7 +318,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -329,7 +329,7 @@
   <joint name="Joint_6a" type="revolute">
     <parent link="Plate5"/>
     <child link="Block6"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -343,7 +343,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -352,7 +352,7 @@
   <joint name="Joint_6b" type="revolute">
     <parent link="Block6"/>
     <child link="Plate6"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -366,7 +366,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -377,7 +377,7 @@
   <joint name="Joint_7a" type="revolute">
     <parent link="Plate6"/>
     <child link="Block7"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -391,7 +391,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -400,7 +400,7 @@
   <joint name="Joint_7b" type="revolute">
     <parent link="Block7"/>
     <child link="Plate7"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -414,7 +414,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Black"/>
     </visual>
@@ -425,7 +425,7 @@
   <joint name="Joint_8a" type="revolute">
     <parent link="Plate7"/>
     <child link="Block8"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -439,7 +439,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -448,7 +448,7 @@
   <joint name="Joint_8b" type="revolute">
     <parent link="Block8"/>
     <child link="Plate8"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -462,7 +462,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -473,7 +473,7 @@
   <joint name="Joint_9a" type="revolute">
     <parent link="Plate8"/>
     <child link="Block9"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -487,7 +487,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -496,7 +496,7 @@
   <joint name="Joint_9b" type="revolute">
     <parent link="Block9"/>
     <child link="Plate9"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -510,7 +510,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -521,7 +521,7 @@
   <joint name="Joint_10a" type="revolute">
     <parent link="Plate9"/>
     <child link="Block10"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -535,7 +535,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -544,7 +544,7 @@
   <joint name="Joint_10b" type="revolute">
     <parent link="Block10"/>
     <child link="Plate10"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -558,7 +558,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -569,7 +569,7 @@
   <joint name="Joint_11a" type="revolute">
     <parent link="Plate10"/>
     <child link="Block11"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -583,7 +583,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -592,7 +592,7 @@
   <joint name="Joint_11b" type="revolute">
     <parent link="Block11"/>
     <child link="Plate11"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -606,7 +606,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Black"/>
     </visual>
@@ -617,7 +617,7 @@
   <joint name="Joint_12a" type="revolute">
     <parent link="Plate11"/>
     <child link="Block12"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -631,7 +631,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -640,7 +640,7 @@
   <joint name="Joint_12b" type="revolute">
     <parent link="Block12"/>
     <child link="Plate12"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -654,7 +654,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -665,7 +665,7 @@
   <joint name="Joint_13a" type="revolute">
     <parent link="Plate12"/>
     <child link="Block13"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -679,7 +679,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -688,7 +688,7 @@
   <joint name="Joint_13b" type="revolute">
     <parent link="Block13"/>
     <child link="Plate13"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -702,7 +702,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -713,7 +713,7 @@
   <joint name="Joint_14a" type="revolute">
     <parent link="Plate13"/>
     <child link="Block14"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -727,7 +727,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -736,7 +736,7 @@
   <joint name="Joint_14b" type="revolute">
     <parent link="Block14"/>
     <child link="Plate14"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -750,7 +750,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -761,7 +761,7 @@
   <joint name="Joint_15a" type="revolute">
     <parent link="Plate14"/>
     <child link="Block15"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -775,7 +775,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="0.05 0.05 0.025"/>
+        <box size="0.023 0.023 0.005"/>
       </geometry>
       <material name="Grey"/>
     </visual>
@@ -784,7 +784,7 @@
   <joint name="Joint_15b" type="revolute">
     <parent link="Block15"/>
     <child link="Plate15"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -798,7 +798,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius="0.100000" length="0.025"/>
+        <cylinder radius="0.035000" length="0.025"/>
       </geometry>
       <material name="Black"/>
     </visual>
@@ -807,7 +807,7 @@
   <joint name="Joint_Camera" type="fixed">
     <parent link="Plate15"/>
     <child link="CameraBox"/>
-    <origin rpy="0 0 0" xyz="0 0 0.050000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.035000"/>
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -820,9 +820,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <sphere radius="0.100000"/>
+        <sphere radius="0.035000"/>
       </geometry>
-      <material name="Red"/>
+      <material name="Black"/>
     </visual>
   </link>
 

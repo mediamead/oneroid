@@ -10,8 +10,14 @@ import cv2
 NP = 4 # number of plates per section
 NJ = 4 # number of sections
 
-H = 400
-W = 400
+#H = 720
+#W = 1280
+#H = 144
+#W = 256
+H = 200
+W = 200
+# https://www.chiefdelphi.com/t/horizontal-fov-of-microsoft-lifecam-cinema/156204/7
+HFOV = 64.4
 
 import os
 
@@ -38,6 +44,7 @@ class Robot:
         p.resetSimulation()
 
         self._loadBody("plane.urdf", [0, 0, 0], [0, 0, 0])
+        self._loadBody("plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
         self.bodyId = self._loadBody("manipulator.urdf")
         assert(p.getNumJoints(self.bodyId) == NJ * NP * 2 + 1)
@@ -45,7 +52,7 @@ class Robot:
         # get id of link the camera is attached to -- the very last joint of the body
         self.cameraLinkId = p.getNumJoints(self.bodyId) - 1
         aspect = W / H
-        self.projection_matrix = p.computeProjectionMatrixFOV(120, aspect, 0.01, 100)
+        self.projection_matrix = p.computeProjectionMatrixFOV(HFOV, aspect, 0.1, 4)
 
         self.targetId = None
 
@@ -83,8 +90,10 @@ class Robot:
 
         for p in range(NP):
             j = (sec * NP + p) * 2
-            self._setJointMotorPosition(j, pos0)
-            self._setJointMotorPosition(j + 1, pos1)
+            if p != 0:
+                self._setJointMotorPosition(j, pos0)
+            if p != NP-1:
+                self._setJointMotorPosition(j + 1, pos1)
 
 # --------------------------------------------------------------------
 
