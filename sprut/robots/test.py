@@ -7,7 +7,7 @@ from sprut_robot import Robot, NJ
 
 import cv2
 
-from camorn import get_cam_orn
+from camorn import get_horizon_bank
 
 if __name__ == "__main__":
     #LOGFILE = "log10s.txt"
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
 
         img = r.getCameraImage()
-        print("camorn=%s" % get_cam_orn(img))
+        print("camorn=%s" % get_horizon_bank(img))
 
         #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
 
