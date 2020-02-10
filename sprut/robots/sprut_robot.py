@@ -12,10 +12,10 @@ NJ = 4 # number of sections
 
 #H = 720
 #W = 1280
-#H = 144
-#W = 256
-H = 200
-W = 200
+H = 144
+W = 256
+#H = 200
+#W = 200
 # https://www.chiefdelphi.com/t/horizontal-fov-of-microsoft-lifecam-cinema/156204/7
 HFOV = 64.4
 
@@ -44,7 +44,7 @@ class Robot:
         p.resetSimulation()
 
         self._loadBody("urdfs/plane.urdf", [0, 0, 0], [0, 0, 0])
-        self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
+        #self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
         self._loadBody("urdfs/green-line.urdf", [3, 0, 1], [np.pi/2, 0, 0])
 

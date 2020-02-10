@@ -7,13 +7,7 @@ from sprut_robot import Robot, NJ
 
 import cv2
 
-def handle_green_line(brg_img):
-    img = cv2.cvtColor(brg_img, cv2.COLOR_BGR2HLS)
-    lower = np.uint8([40, 40,40])
-    upper = np.uint8([70, 255, 255])
-    green_mask = cv2.inRange(img, lower, upper)
-    cv2.imshow("mask", green_mask) 
-    cv2.waitKey(1)
+from camorn import get_cam_orn
 
 if __name__ == "__main__":
     #LOGFILE = "log10s.txt"
@@ -79,7 +73,8 @@ if __name__ == "__main__":
         #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
 
         img = r.getCameraImage()
-        handle_green_line(img)
+        print("camorn=%s" % get_cam_orn(img))
+
         #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
 
         #print("%f %f" % (t, reward), file=logf)
