@@ -43,12 +43,12 @@ class Robot:
         # load urdf and set gravity
         p.resetSimulation()
 
-        self._loadBody("plane.urdf", [0, 0, 0], [0, 0, 0])
-        self._loadBody("plane.urdf", [0, 0, 3], [0, np.pi, 0])
+        self._loadBody("urdfs/plane.urdf", [0, 0, 0], [0, 0, 0])
+        self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
         self._loadBody("urdfs/green-line.urdf", [3, 0, 1], [np.pi/2, 0, 0])
 
-        self.bodyId = self._loadBody("manipulator.urdf")
+        self.bodyId = self._loadBody("urdfs/manipulator.urdf")
         assert(p.getNumJoints(self.bodyId) == NJ * NP * 2 + 1)
 
         # get id of link the camera is attached to -- the very last joint of the body
@@ -70,7 +70,7 @@ class Robot:
             p.removeBody(self.targetId)
             self.targetId = None
 
-        self.targetId = self._loadBody("target.urdf", pos)
+        self.targetId = self._loadBody("urdfs/target.urdf", pos)
 
 # --------------------------------------------------------------------
 
