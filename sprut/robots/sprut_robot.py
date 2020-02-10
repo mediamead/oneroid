@@ -46,6 +46,8 @@ class Robot:
         self._loadBody("plane.urdf", [0, 0, 0], [0, 0, 0])
         self._loadBody("plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
+        self._loadBody("urdfs/green-line.urdf", [3, 0, 1], [np.pi/2, 0, 0])
+
         self.bodyId = self._loadBody("manipulator.urdf")
         assert(p.getNumJoints(self.bodyId) == NJ * NP * 2 + 1)
 
