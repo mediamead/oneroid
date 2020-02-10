@@ -3,11 +3,11 @@
 import pybullet as p
 import numpy as np
 
-from sprut_robot import Robot, NJ
+from sprut_robot import Robot, NJ, W, H
 
 import cv2
 
-from camorn import get_horizon_bank
+from camorn import set_headcam_params, get_horizon_bank
 
 if __name__ == "__main__":
     #LOGFILE = "log10s.txt"
@@ -15,6 +15,8 @@ if __name__ == "__main__":
 
     gui = True
     r = Robot(render=gui)
+
+    set_headcam_params(W, H)
 
     # Target and manipulator are both NNE
     r.setTarget([1.5, 1.5, 1])
@@ -73,7 +75,7 @@ if __name__ == "__main__":
         #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
 
         img = r.getCameraImage()
-        print("camorn=%s" % get_horizon_bank(img))
+        print("horizon_bank=%s" % get_horizon_bank(img))
 
         #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
 

@@ -3,7 +3,15 @@ import numpy as np
 
 from pylsd.lsd import lsd
 
-def get_horizon_lines(bgr_img):
+W = None
+H = None
+
+def set_headcam_params(_W, _H):
+    global W, H
+    W = _W
+    H = _H
+
+def _get_horizon_lines(bgr_img):
     """
     Given BGR image,
     Returns list of green lines (x1,y1,x2,y2,w).
@@ -23,8 +31,8 @@ def get_horizon_bank(bgr_img):
     Returns horizon rotation angle (in radians, growing from axis X towards Y)
         or None if horizon line not found
     """
-    lines = get_horizon_lines(bgr_img)
-    H, W = bgr_img.shape[0:2]
+    lines = _get_horizon_lines(bgr_img)
+    #H, W = bgr_img.shape[0:2]
     for i in range(lines.shape[0]):
         lx = (lines[i, 2] - lines[i, 0]) / W
         ly = (lines[i, 3] - lines[i, 1]) / W
@@ -52,3 +60,10 @@ def get_horizon_bank(bgr_img):
             return angle
 
     return None
+
+def get_rotated_headcam_view(bgr_img, angle):
+    """
+    Given actual headcam view,
+    Return rotated and cropped to a circle
+    """
+    return bgr_img # FIXME
