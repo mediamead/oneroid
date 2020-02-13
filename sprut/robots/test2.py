@@ -10,18 +10,21 @@ if __name__ == "__main__":
 
     tr = TensorRobot(NS, NP)
     pr = PyBulletRobot(NS, NP)
-    rs = [tr, pr]
 
     ls = np.array([[np.pi/10,0],[np.pi/5,0]], dtype=np.float32)
-    #ls = np.array([[np.pi/4,0]], dtype=np.float32)
-    print("# ls=%s" % ls)
 
-    for r in rs:
-        r.step(ls)
-        (p, v, u) = r.getHeadcamPVU()
-        print("p=%s v=%s u=%s" % (p, v, u))
+    tr.step(ls)
+    pr.step(ls)
+
+    tr_pvu = tr.getHeadcamPVU()
+    pr_pvu = pr.getHeadcamPVU()
+    
+    tr_p = tr_pvu[0].flatten()
+    pr_p = np.array(list(pr_pvu[0]))
+    err_p = np.linalg.norm(tr_p - pr_p)
+    print("err_p=%f p=%s p=%s" % (err_p, tr_p, pr_p))
 
     #tr.train()
 
-    for r in rs:
-        r.close()
+    tr.close()
+    pr.close()

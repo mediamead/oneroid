@@ -79,10 +79,10 @@ class TensorRobot:
        # (i, j, k, 2*k+1, phiy, sin_phiy))
 
   def getHeadcamPVU(self):
-    print("# lv.shape=%s lv=%s" % (self.lv.shape, self.lv))
+    #print("# lv.shape=%s lv=%s" % (self.lv.shape, self.lv))
     (p, v, u, vs) = self.sess.run(self.model_pvu_l, feed_dict={self.l: self.lv})
     #print("p=%s v=%s u=%s vs=%s" % (p, v, u, vs))
-    print("p=%s v=%s u=%s" % (p, v, u))
+    #print("p=%s v=%s u=%s" % (p, v, u))
     return (p, v, u)
 
   def close(self):
