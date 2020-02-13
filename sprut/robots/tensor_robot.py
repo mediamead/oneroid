@@ -1,11 +1,6 @@
 import tensorflow as tf
 import numpy as np
 
-# Create a computational graph.
-    
-# 4 pairs of string shifts per section, lx and ly
-NS = 4
-
 class TensorRobot:
   # String shifts are proportinal to sine of rotation angles they produce, if actuated independently.
   # If actuated together, they produce larger rotation angles.
@@ -45,19 +40,20 @@ class TensorRobot:
             (p, v, u) = self.mk_section(i, p, v, u, l[i,:] / 4)
         return [p, v, u]
 
-  def __init__(self, render=False):
+  def __init__(self, NS=4, render=False):
     print("*** Initializing TensorRobot(render=%s) ..." % render)
 
+    self.NS = 4
     self.sess = tf.compat.v1.Session()
     init = tf.compat.v1.global_variables_initializer() 
     self.sess.run(init)
 
-    self.l = tf.placeholder("float", [NS, 2])
+    self.l = tf.placeholder("float", [self.NS, 2])
     self.model_pvu_l = self.mk_model(self.l)
     print("*** Initializing TensorRobot() done")
 
   def step(self, phis):
-    self.ls = np.sin(phis / (np.pi/2))
+    self.ls = np.sin(np.sin(phis))
 
   def getHeadcamPVU(self):
     (p, v, u) = self.sess.run(self.model_pvu_l, feed_dict={self.l: self.ls})

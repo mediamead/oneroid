@@ -3,7 +3,7 @@
 import pybullet as p
 import numpy as np
 
-from pybullet_robot import PyBulletRobot, NJ, W, H
+from pybullet_robot import PyBulletRobot, W, H
 
 import cv2
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #logf = open(LOGFILE, "w")
 
     gui = True
-    r = PyBulletRobot(render=gui)
+    r = PyBulletRobot(4, render=gui)
 
     set_headcam_params(W, H)
 
@@ -25,13 +25,13 @@ if __name__ == "__main__":
         s_t_phi = p.addUserDebugParameter("t_phi", -1.5, 1.5, 0)
 
         phiSliders = []
-        for i in range(NJ):    
+        for i in range(r.NS):    
           for j in [0, 1]:
             title = "%d:%d" % (i, j)
             s = p.addUserDebugParameter(title, -1.5, 1.5, 0)
             phiSliders.append((i, j,s))
     else:
-        phis = np.zeros((NJ, 2), dtype=np.float32)
+        phis = np.zeros((r.NS, 2), dtype=np.float32)
         #for i in range(NJ * 2):
         #phis.append(0)
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
                 do_step = True
 
-            phis = np.zeros((NJ, 2), dtype=np.float32)
+            phis = np.zeros((r.NS, 2), dtype=np.float32)
             for (i, j, s) in phiSliders:
                 phi = p.readUserDebugParameter(s)
                 phis[i, j] = phi

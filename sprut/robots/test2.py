@@ -9,7 +9,7 @@ if __name__ == "__main__":
     rs.append(TensorRobot())
     rs.append(PyBulletRobot())
 
-    ls = np.array([[0,0],[0,0],[0,0],[0,0]], dtype=np.float32)
+    ls = np.array([[np.pi/4,0],[0,0],[0,0],[0,0]], dtype=np.float32)
     print("# ls=%s" % ls)
 
     for r in rs:

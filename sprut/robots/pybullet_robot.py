@@ -8,7 +8,6 @@ import numpy as np
 import cv2
 
 NP = 4 # number of plates per section
-NJ = 4 # number of sections
 
 #H = 720
 #W = 1280
@@ -25,8 +24,10 @@ BASEDIR = os.path.dirname(__file__)
 
 class PyBulletRobot:
 
-    def __init__(self, render=False):
-        print("*** Initializing PyBulletRobot(render=%s) ..." % render)
+    def __init__(self, NS, render=False):
+        self.NS = NS
+        
+        print("*** Initializing PyBulletRobot(ns=%d, render=%s) ..." % (self.NS, render))
         # Start pybullet simulation
         if render:
             p.connect(p.GUI)
@@ -48,8 +49,8 @@ class PyBulletRobot:
 
         self._loadBody("urdfs/green-line.urdf", [3, 0, 1], [np.pi/2, 0, 0])
 
-        self.bodyId = self._loadBody("urdfs/manipulator.urdf")
-        assert(p.getNumJoints(self.bodyId) == NJ * NP * 2 + 1)
+        self.bodyId = self._loadBody("urdfs/manipulator-%d.urdf" % self.NS)
+        assert(p.getNumJoints(self.bodyId) == self.NS * NP * 2 + 1)
 
         # get id of link the camera is attached to -- the very last joint of the body
         self.cameraLinkId = p.getNumJoints(self.bodyId) - 1
@@ -198,9 +199,6 @@ class PyBulletRobot:
     #     self.dx = dx
     #     self.dy = dy
     #     self.dr = dr
-
-    def get_nphis(self):
-        return NJ
 
     # step through the simluation
     def step(self, phis):
