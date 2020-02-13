@@ -136,9 +136,9 @@ class URDFPrinter():
 
   base_name = "SprutBase"
 
-  def print_manipulator(self, f, NS):
+  def print_manipulator(self, f, NS, NP):
     self.print_header(f, "Manipulator")
-    last_plate = self.print_manipulator_body(f, NS)
+    last_plate = self.print_manipulator_body(f, NS, NP)
     self.print_manipulator_camera(f, last_plate)
     self.print_footer(f)
 
@@ -158,7 +158,7 @@ class URDFPrinter():
   def print_footer(self, f):
     print(self.footer,file = f)
 
-  def print_manipulator_body(self, f, NS):
+  def print_manipulator_body(self, f, NS, NP):
     """
     Prints all segments of the manipulator's body
     Returns the name of the very last link (to mount the camera on)
@@ -166,7 +166,7 @@ class URDFPrinter():
     print(self.manipulator_base_template % {"base_name": self.base_name}, file=f)
 
     JD = 0.028 # 4mm plate + 24mm to the axis
-    NJ = NS * pybullet_robot.NP
+    NJ = NS * NP
     for i in range(NJ):
       if i > 0:
         parent = "Plate%d" % (i-1)
@@ -202,7 +202,8 @@ class URDFPrinter():
     print(self.target_template % {"xyz": "1 1 1", "r": 0.25}, file=f)
 
 p = URDFPrinter()
-for NS in [1, 4]:
-  p.print_manipulator(open("urdfs/manipulator-%d.urdf" % NS, "w"), NS)
+for NS in [1, 2, 4]:
+ for NP in [1, 2, 4]:
+  p.print_manipulator(open("urdfs/manipulator-%d-%d.urdf" % (NS, NP), "w"), NS, NP)
 p.print_target(open("urdfs/target.urdf", "w"))
 p.print_cage(open("urdfs/cage.urdf", "w"))

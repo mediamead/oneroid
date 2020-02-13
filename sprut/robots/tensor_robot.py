@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
+JZ2 = 0.028
+
 class TensorRobot:
   # String shifts are proportinal to sine of rotation angles they produce, if actuated independently.
   # If actuated together, they produce larger rotation angles.
@@ -24,36 +26,48 @@ class TensorRobot:
     u1 = tf.matmul(Ryx, u, name=("u%d" % i1))
     
     # translate position of the lower plate with v and v1 to position of the upper plate
-    p1 = tf.add(p, tf.add(v, v1), name=("p%d" % i1))
+    p1 = tf.add(p, tf.add(v, v1) * JZ2, name=("p%d" % i1))
     
     return (p1, v1, u1)
 
   def mk_model(self, l):
         # base position
         p0 = tf.expand_dims(tf.constant([0., 0., 0.], name="p0"), 1)
-        v0 = tf.expand_dims(tf.constant([0., 0., 0.028], name="v0"), 1)
+        v0 = tf.expand_dims(tf.constant([0., 0., 1], name="v0"), 1)
         u0 = tf.expand_dims(tf.constant([-1., 0., 0.], name="u0"), 1)
 
         (p, v, u) = (p0, v0, u0)
-        for i in range(NS):
-          for _ in range(4):
-            (p, v, u) = self.mk_section(i, p, v, u, l[i,:] / 4)
+        for i in range(self.NS):
+          for _ in range(self.NP):
+            (p, v, u) = self.mk_section(i, p, v, u, l[i,:])
         return [p, v, u]
 
-  def __init__(self, NS=4, render=False):
+  def __init__(self, NS, NP, render=False):
     print("*** Initializing TensorRobot(render=%s) ..." % render)
 
-    self.NS = 4
+    self.NS = NS
+    self.NP = NP
     self.sess = tf.compat.v1.Session()
     init = tf.compat.v1.global_variables_initializer() 
     self.sess.run(init)
 
-    self.l = tf.placeholder("float", [self.NS, 2])
+    self.l = tf.placeholder("float", [self.NS*self.NP, 2])
     self.model_pvu_l = self.mk_model(self.l)
     print("*** Initializing TensorRobot() done")
 
   def step(self, phis):
-    self.ls = np.sin(np.sin(phis))
+    self.ls = np.zeros((self.NS*self.NP, 2), dtype=np.float32)
+
+    for i in range(self.NS):
+      phix = phis[i][0] / self.NP
+      phiy = phis[i][1] / self.NP
+
+      for j in range(self.NP):
+       k = i*self.NP+j
+       self.ls[k][0] = np.sin(phix)
+       self.ls[k][1] = np.sin(phiy)
+       print("## TENSORROBOT: section=%d plate=%d joint=%d phi=%.3f" % (i, j, 2*k, phix))
+       print("## TENSORROBOT: section=%d plate=%d joint=%d phi=%.3f" % (i, j, 2*k+1, phiy))
 
   def getHeadcamPVU(self):
     (p, v, u) = self.sess.run(self.model_pvu_l, feed_dict={self.l: self.ls})
@@ -93,7 +107,7 @@ class TensorRobot:
 #p4 = tf.expand_dims(tf.constant([7, 0., 2], name="p4"), 1)
 
 if __name__ == "__main__":
-    r = TensorRobot()
+    r = TensorRobot(4, 4)
     ls = np.array([[0,0],[0,0],[0,0],[0,0]], dtype=np.float32)
     if True:
         print("# ls=%s" % ls)

@@ -6,10 +6,13 @@ from tensor_robot import TensorRobot
 
 if __name__ == "__main__":
     rs = []
-    rs.append(TensorRobot())
-    rs.append(PyBulletRobot())
+    NS = 2
+    NP = 2
+    rs.append(TensorRobot(NS, NP))
+    rs.append(PyBulletRobot(NS, NP))
 
-    ls = np.array([[np.pi/4,0],[0,0],[0,0],[0,0]], dtype=np.float32)
+    ls = np.array([[np.pi/6,0],[0,0],[0,0],[0,0]], dtype=np.float32)
+    #ls = np.array([[np.pi/4,0]], dtype=np.float32)
     print("# ls=%s" % ls)
 
     for r in rs:

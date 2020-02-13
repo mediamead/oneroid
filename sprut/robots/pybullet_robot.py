@@ -7,8 +7,6 @@ import numpy as np
 
 import cv2
 
-NP = 4 # number of plates per section
-
 #H = 720
 #W = 1280
 H = 144
@@ -24,9 +22,10 @@ BASEDIR = os.path.dirname(__file__)
 
 class PyBulletRobot:
 
-    def __init__(self, NS, render=False):
+    def __init__(self, NS, NP, render=False):
         self.NS = NS
-        
+        self.NP = NP
+
         print("*** Initializing PyBulletRobot(ns=%d, render=%s) ..." % (self.NS, render))
         # Start pybullet simulation
         if render:
@@ -49,8 +48,8 @@ class PyBulletRobot:
 
         self._loadBody("urdfs/green-line.urdf", [3, 0, 1], [np.pi/2, 0, 0])
 
-        self.bodyId = self._loadBody("urdfs/manipulator-%d.urdf" % self.NS)
-        assert(p.getNumJoints(self.bodyId) == self.NS * NP * 2 + 1)
+        self.bodyId = self._loadBody("urdfs/manipulator-%d-%d.urdf" % (self.NS, self.NP))
+        assert(p.getNumJoints(self.bodyId) == self.NS * self.NP * 2 + 1)
 
         # get id of link the camera is attached to -- the very last joint of the body
         self.cameraLinkId = p.getNumJoints(self.bodyId) - 1
@@ -87,13 +86,14 @@ class PyBulletRobot:
         #                        positionGain=1000,
         #                        velocityGain=0,
         #                        maxVelocity=5)
+        print("## PYBULLETROBOT: joint=%d pos=%.3f" % (joint, pos))
 
     def _setJointPosition(self, sec, pos0, pos1):
-        pos0 /= NP
-        pos1 /= NP
+        pos0 /= self.NP
+        pos1 /= self.NP
 
-        for p in range(NP):
-            j = (sec * NP + p) * 2
+        for p in range(self.NP):
+            j = (sec * self.NP + p) * 2
           #if p != 0:
             self._setJointMotorPosition(j, pos0)
           #if p != NP-1:
@@ -202,7 +202,7 @@ class PyBulletRobot:
 
     # step through the simluation
     def step(self, phis):
-        for i in range(phis.shape[0]):
+        for i in range(self.NS):
             self._setJointPosition(i, phis[i, 0], phis[i, 1])
         p.stepSimulation()
 
@@ -214,7 +214,7 @@ class PyBulletRobot:
         print("*** PyBulletRobot() closed ***")
 
 if __name__ == "__main__":
-    r = PyBulletRobot(render=False)
+    r = PyBulletRobot(4, 4)
     ls = np.array([[0,0],[0,0],[0,0],[0,0]], dtype=np.float32)
     if True:
         print("# ls=%s" % ls)
