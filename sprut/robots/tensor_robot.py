@@ -36,12 +36,13 @@ class TensorRobot:
   def mk_model(self, l):
         # base position
         p0 = tf.expand_dims(tf.constant([0., 0., 0.], name="p0"), 1)
-        v0 = tf.expand_dims(tf.constant([0., 0., 1.], name="v0"), 1)
+        v0 = tf.expand_dims(tf.constant([0., 0., 0.028], name="v0"), 1)
         u0 = tf.expand_dims(tf.constant([-1., 0., 0.], name="u0"), 1)
 
         (p, v, u) = (p0, v0, u0)
         for i in range(NS):
-            (p, v, u) = self.mk_section(i, p, v, u, l[i,:])
+          for _ in range(4):
+            (p, v, u) = self.mk_section(i, p, v, u, l[i,:] / 4)
         return [p, v, u]
 
   def __init__(self, render=False):

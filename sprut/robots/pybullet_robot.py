@@ -93,10 +93,10 @@ class PyBulletRobot:
 
         for p in range(NP):
             j = (sec * NP + p) * 2
-            if p != 0:
-                self._setJointMotorPosition(j, pos0)
-            if p != NP-1:
-                self._setJointMotorPosition(j + 1, pos1)
+          #if p != 0:
+            self._setJointMotorPosition(j, pos0)
+          #if p != NP-1:
+            self._setJointMotorPosition(j + 1, pos1)
 
 # --------------------------------------------------------------------
 
