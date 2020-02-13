@@ -86,7 +86,7 @@ class PyBulletRobot:
         #                        positionGain=1000,
         #                        velocityGain=0,
         #                        maxVelocity=5)
-        print("## PYBULLETROBOT: joint=%d pos=%.3f" % (joint, pos))
+        ##("## PYBULLETROBOT: joint=%d pos=%.3f" % (joint, pos))
 
     def _setJointPosition(self, sec, pos0, pos1):
         pos0 /= self.NP

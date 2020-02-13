@@ -1,0 +1,109 @@
+
+<?xml version="1.0" ?>
+
+<robot name="Manipulator">
+
+  <!-- Colors -->
+  <material name="Black">
+    <color rgba="0 0 0 1.0"/>
+  </material>
+  <material name="Grey">
+    <color rgba="0.2 0.2 0.2 1.0"/>
+  </material>
+  <material name="Orange">
+    <color rgba="1.0 0.423529411765 0.0392156862745 1.0"/>
+  </material>
+  <material name="Blue">
+  <color rgba="0.0 0.0 1 1.0"/>      
+  </material>
+  <material name="Red">
+    <color rgba="1 0 0 1.0"/>      
+  </material>
+
+  <!-- Base Link -->
+  <link name="SprutBase">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="100"/>
+      <inertia ixx="9.3" ixy="0" ixz="0" iyy="9.3" iyz="0" izz="9.3"/>
+    </inertial>
+    <!-- visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="1 1 0" />
+      </geometry>
+      <material name="Black"/>
+    </visual -->
+  </link>
+
+  <!-- Section 0 -->
+
+  <joint name="Joint_0a" type="revolute">
+    <parent link="SprutBase"/>
+    <child link="Block0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="Block0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.023 0.023 0.005"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <joint name="Joint_0b" type="revolute">
+    <parent link="Block0"/>
+    <child link="Plate0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="Plate0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.035000" length="0.025"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <joint name="Joint_Camera" type="fixed">
+    <parent link="Plate0"/>
+    <child link="CameraBox"/>
+    <origin rpy="0 0 0" xyz="0 0 0.000000"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="CameraBox">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.035000"/>
+      </geometry>
+      <material name="Black"/>
+    </visual>
+  </link>
+
+</robot>
