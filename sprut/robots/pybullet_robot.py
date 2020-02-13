@@ -23,10 +23,10 @@ import os
 
 BASEDIR = os.path.dirname(__file__)
 
-class Robot:
+class PyBulletRobot:
 
-    def __init__(self, render):
-        print("*** Robot(render=%s) inited ***" % render)
+    def __init__(self, render=False):
+        print("*** Initializing PyBulletRobot(render=%s) ..." % render)
         # Start pybullet simulation
         if render:
             p.connect(p.GUI)
@@ -57,6 +57,7 @@ class Robot:
         self.projection_matrix = p.computeProjectionMatrixFOV(HFOV, aspect, 0.1, 4)
 
         self.targetId = None
+        print("*** Initializing PyBulletRobot() done")
 
     def _loadBody(self, f, startPos=[0, 0, 0], startOrientationEuler=[0, 0, 0]):
         startOrientation = p.getQuaternionFromEuler(startOrientationEuler)
@@ -203,8 +204,8 @@ class Robot:
 
     # step through the simluation
     def step(self, phis):
-        for i in range(NJ):
-            self._setJointPosition(i, phis[i*2], phis[i*2+1])
+        for i in range(phis.shape[0]):
+            self._setJointPosition(i, phis[i, 0], phis[i, 1])
         p.stepSimulation()
 
         #t += timeStep
@@ -212,4 +213,13 @@ class Robot:
 
     def close(self):
         p.disconnect()
-        print("*** Robot() closed ***")
+        print("*** PyBulletRobot() closed ***")
+
+if __name__ == "__main__":
+    r = PyBulletRobot(render=False)
+    ls = np.array([[0,0],[0,0],[0,0],[0,0]], dtype=np.float32)
+    if True:
+        print("# ls=%s" % ls)
+        r.step(ls)
+        (p, v, u) = r.getHeadcamPVU()
+        print("p=%s v=%s u=%s" % (p, v, u))
