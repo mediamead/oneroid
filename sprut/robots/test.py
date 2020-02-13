@@ -3,7 +3,7 @@
 import pybullet as p
 import numpy as np
 
-from sprut_robot import Robot, NJ, W, H
+from pybullet_robot import PyBulletRobot, NJ, W, H
 
 import cv2
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #logf = open(LOGFILE, "w")
 
     gui = True
-    r = Robot(render=gui)
+    r = PyBulletRobot(render=gui)
 
     set_headcam_params(W, H)
 
@@ -25,14 +25,15 @@ if __name__ == "__main__":
         s_t_phi = p.addUserDebugParameter("t_phi", -1.5, 1.5, 0)
 
         phiSliders = []
-        for i in range(NJ * 2):
-            title = "%d:%d" % (i / 2, i % 2)
+        for i in range(NJ):    
+          for j in [0, 1]:
+            title = "%d:%d" % (i, j)
             s = p.addUserDebugParameter(title, -1.5, 1.5, 0)
-            phiSliders.append(s)
+            phiSliders.append((i, j,s))
     else:
-        phis = []
-        for i in range(NJ * 2):
-            phis.append(0)
+        phis = np.zeros((NJ, 2), dtype=np.float32)
+        #for i in range(NJ * 2):
+        #phis.append(0)
 
     old_t_phi = None
     old_phis = None
@@ -52,10 +53,10 @@ if __name__ == "__main__":
 
                 do_step = True
 
-            phis = []
-            for s in phiSliders:
+            phis = np.zeros((NJ, 2), dtype=np.float32)
+            for (i, j, s) in phiSliders:
                 phi = p.readUserDebugParameter(s)
-                phis.append(phi)
+                phis[i, j] = phi
 
             #print("%s <=> %s" % (old_phis, phis))
             if old_phis is None or not np.array_equal(phis, old_phis):
