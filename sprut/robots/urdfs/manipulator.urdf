@@ -807,7 +807,7 @@
   <joint name="Joint_Camera" type="fixed">
     <parent link="Plate15"/>
     <child link="CameraBox"/>
-    <origin rpy="0 0 0" xyz="0 0 0.035000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.000000"/>
     <axis xyz="0 0 1"/>
   </joint>
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sprut_robot
+import pybullet_robot
 
 class URDFPrinter():
   header = """
@@ -166,7 +166,7 @@ class URDFPrinter():
     print(self.manipulator_base_template % {"base_name": self.base_name}, file=f)
 
     JD = 0.028 # 4mm plate + 24mm to the axis
-    NJ = sprut_robot.NJ * sprut_robot.NP
+    NJ = pybullet_robot.NJ * pybullet_robot.NP
     for i in range(NJ):
       if i > 0:
         parent = "Plate%d" % (i-1)
@@ -191,7 +191,7 @@ class URDFPrinter():
     print(self.manipulator_camera_template % {
       "parent_link": parent_link,
       "size": 0.035,
-      "camera_z": 0.035,
+      "camera_z": 0, #0.035,
       "color": "Black"
       }, file=f)
 
@@ -202,6 +202,6 @@ class URDFPrinter():
     print(self.target_template % {"xyz": "1 1 1", "r": 0.25}, file=f)
 
 p = URDFPrinter()
-p.print_manipulator(open("manipulator.urdf", "w"))
-p.print_target(open("target.urdf", "w"))
-p.print_cage(open("cage.urdf", "w"))
+p.print_manipulator(open("urdfs/manipulator.urdf", "w"))
+p.print_target(open("urdfs/target.urdf", "w"))
+p.print_cage(open("urdfs/cage.urdf", "w"))
