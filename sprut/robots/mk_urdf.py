@@ -70,10 +70,25 @@ class URDFPrinter():
 
   <joint name="Joint_%(index)db" type="revolute">
     <parent link="Block%(index)d"/>
+    <child link="PlateFixLink%(index)d"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink%(index)d">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint%(index)db" type="fixed">
+    <parent link="PlateFixLink%(index)d"/>
     <child link="Plate%(index)d"/>
     <origin rpy="0 0 0" xyz="0 0 %(joint_z)f"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate%(index)d">
@@ -190,7 +205,7 @@ class URDFPrinter():
   def print_manipulator_camera(self, f, parent_link):
     print(self.manipulator_camera_template % {
       "parent_link": parent_link,
-      "size": 0.035,
+      "size": 0.005,
       "camera_z": 0, #0.035,
       "color": "Black"
       }, file=f)

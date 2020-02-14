@@ -63,10 +63,25 @@
 
   <joint name="Joint_0b" type="revolute">
     <parent link="Block0"/>
+    <child link="PlateFixLink0"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint0b" type="fixed">
+    <parent link="PlateFixLink0"/>
     <child link="Plate0"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate0">
@@ -100,7 +115,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <sphere radius="0.035000"/>
+        <sphere radius="0.005000"/>
       </geometry>
       <material name="Black"/>
     </visual>

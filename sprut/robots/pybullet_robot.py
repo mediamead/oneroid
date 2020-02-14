@@ -20,7 +20,7 @@ import os
 
 BASEDIR = os.path.dirname(__file__)
 
-class PyBulletRobot:
+class PyBulletRobot(object):
 
     def __init__(self, NS, NP, render=False):
         self.NS = NS
@@ -49,7 +49,7 @@ class PyBulletRobot:
         self._loadBody("urdfs/green-line.urdf", [3, 0, 1], [np.pi/2, 0, 0])
 
         self.bodyId = self._loadBody("urdfs/manipulator-%d-%d.urdf" % (self.NS, self.NP))
-        assert(p.getNumJoints(self.bodyId) == self.NS * self.NP * 2 + 1)
+        assert(p.getNumJoints(self.bodyId) == self.NS * self.NP * 3 + 1)
 
         # get id of link the camera is attached to -- the very last joint of the body
         self.cameraLinkId = p.getNumJoints(self.bodyId) - 1
@@ -93,7 +93,7 @@ class PyBulletRobot:
         pos1 /= self.NP
 
         for p in range(self.NP):
-            j = (sec * self.NP + p) * 2
+            j = (sec * self.NP + p) * 3
           #if p != 0:
             self._setJointMotorPosition(j, pos0)
           #if p != NP-1:
@@ -168,13 +168,18 @@ class PyBulletRobot:
             R += [r[0], r[1]] # take only XJ proj
         return np.linalg.norm(R)
 
-    # def _print_joints_pos(self):
-    #     for i in range(p.getNumJoints(self.bodyId)):
-    #         js = p.getJointState(self.bodyId, i)
-    #         #print("%4.1f/%4.1f " % (js[0], js[1]), end="")
-    #         print("%4.3f " % (js[0]), end="")
-    #     print()
-    #
+    def _print_joints_pos(self):
+        for i in range(p.getNumJoints(self.bodyId)):
+            js = p.getJointState(self.bodyId, i)
+            pos, orn, _, _, _, _ = p.getLinkState(self.bodyId, i)
+
+            rot_matrix = p.getMatrixFromQuaternion(orn)
+            rot_matrix = np.array(rot_matrix).reshape(3, 3)
+            v = rot_matrix.dot((0, 0, 1))
+
+            print("#J%d %f" % (i, js[0]))
+            print("#B%d %s %s" % (i, pos, v))
+
     # def updateQ(self):
     #     oc = self.getOffCenter()
     #     if oc is not None:
@@ -212,6 +217,9 @@ class PyBulletRobot:
     def close(self):
         p.disconnect()
         print("*** PyBulletRobot() closed ***")
+
+    def stepSimulation(self):
+        p.stepSimulation()
 
 if __name__ == "__main__":
     r = PyBulletRobot(4, 4)

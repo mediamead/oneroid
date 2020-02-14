@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #logf = open(LOGFILE, "w")
 
     gui = True
-    r = PyBulletRobot(4, render=gui)
+    r = PyBulletRobot(4, 4, render=gui)
 
     set_headcam_params(W, H)
 

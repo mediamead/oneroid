@@ -1,14 +1,17 @@
 import tensorflow as tf
 import numpy as np
 
-JZ2 = 0.028
+_JZ = 0.028
+JZ = tf.constant(np.array([[_JZ], [_JZ], [_JZ]], dtype=np.float32))
 
 class TensorRobot:
   # String shifts are proportinal to sine of rotation angles they produce, if actuated independently.
   # If actuated together, they produce larger rotation angles.
   # Can build a graph, computing rotation matrix. Let sin(beta) = lx and sin(gamma) = ly.
   def mk_section(self, i, p, v, u, l):
-    i1 = i+1
+    #i1 = i+1
+
+    p_box = p + JZ * v
 
     # create Rxy rotation matrix
     sin_beta = l[0] # lx
@@ -17,18 +20,25 @@ class TensorRobot:
     cos_gamma = tf.math.sqrt(1. - sin_gamma**2)
     minus_sin_beta = tf.negative(sin_beta)
     minus_sin_gamma = tf.negative(sin_gamma)
+
     Ry = [[cos_beta, 0., sin_beta], [0., 1., 0.], [minus_sin_beta, 0, cos_beta]]
-    #Rx = [[1., 0., 0.], [0, cos_gamma, minus_sin_gamma], [0., sin_gamma, cos_gamma]]
-    Ryx = Ry # tf.matmul(Ry, Rx, #name=("Ryx%d" % i1))
+    v_box = tf.matmul(Ry, v)
+    u_box = tf.matmul(Ry, u)
+
+    Rx = [[1., 0., 0.], [0., cos_gamma, minus_sin_gamma], [0., sin_gamma, cos_gamma]]
+    #Rx = [[1., 0., 0.], [0., cos_gamma, sin_gamma], [0., minus_sin_gamma, cos_gamma]]
+    v_plate = tf.matmul(Rx, v_box) #, name=("Ryx%d" % i1))
+    u_plate = tf.matmul(Rx, u_box) #, name=("Ryx%d" % i1))
     
     # rotate lower plate orientation vectors with Rxy to get orientation vectors of the upper plate
-    v1 = tf.matmul(Ryx, v) #, name=("v%d" % i1))
-    u1 = tf.matmul(Ryx, u) #, name=("u%d" % i1))
+    #v1 = tf.matmul(Ryx, v) #, name=("v%d" % i1))
+    #u1 = tf.matmul(Ryx, u) #, name=("u%d" % i1))
     
     # translate position of the lower plate with v and v1 to position of the upper plate
-    p1 = tf.add(p, tf.add(v, v1) * JZ2) #, name=("p%d" % i1))
+    #p1 = tf.add(p, JZ2 * tf.add(v, v1)) #, name=("p%d" % i1))
+    p_plate = p_box + JZ * v_plate
     
-    return (p1, v1, u1)
+    return (p_plate, v_plate, u_plate, [p_box, v_box, p_plate, v_plate])
 
   def mk_model(self, l):
         # base position
@@ -37,14 +47,14 @@ class TensorRobot:
         u0 = tf.expand_dims(tf.constant([-1., 0., 0.], name="u0"), 1)
 
         (p, v, u) = (p0, v0, u0)
-        vs = []
+        infos = []
         for i in range(self.NS):
           for j in range(self.NP):
             ll = l[i*self.NP+j]
-            (p, v, u) = self.mk_section(i*self.NP+j, p, v, u, ll)
+            (p, v, u, info) = self.mk_section(i*self.NP+j, p, v, u, ll)
             #vs.append([tf.constant(i), tf.constant(j), ll])
-            vs.append([p, v, u])
-        return [p, v, u, vs]
+            infos.append(info)
+        return [p, v, u, infos]
 
   def __init__(self, NS, NP, render=False):
     print("*** Initializing TensorRobot(render=%s) ..." % render)
@@ -57,7 +67,7 @@ class TensorRobot:
 
     self.l = tf.placeholder("float", [self.NS*self.NP, 2])
     self.model_pvu_l = self.mk_model(self.l)
-    self.model_pvu_l[3].append(self.l)
+    #self.model_pvu_l[3].append(self.l)
     print("*** Initializing TensorRobot() done")
 
   def step(self, phis):
@@ -80,10 +90,12 @@ class TensorRobot:
 
   def getHeadcamPVU(self):
     #print("# lv.shape=%s lv=%s" % (self.lv.shape, self.lv))
-    (p, v, u, vs) = self.sess.run(self.model_pvu_l, feed_dict={self.l: self.lv})
-    #print("p=%s v=%s u=%s vs=%s" % (p, v, u, vs))
-    #print("p=%s v=%s u=%s" % (p, v, u))
-    return (p, v, u)
+    (p, v, u, infos) = self.sess.run(self.model_pvu_l, feed_dict={self.l: self.lv})
+    print("#TR: p=%s v=%s u=%s" % (p, v, u))
+    for (p_box, v_box, p_plate, v_plate) in infos:
+      print("box   p=%s v=%s" % (p_box.flatten(), v_box.flatten()))
+      print("plate p=%s v=%s" % (p_plate.flatten(), v_plate.flatten()))
+    return (p, v, u, infos)
 
   def close(self):
       self.sess.close()
