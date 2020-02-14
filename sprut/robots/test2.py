@@ -7,7 +7,7 @@ from tensor_robot import TensorRobot
 class HybridRobot(object):
   def __init__(self, NS, NP):
     self.tr = TensorRobot(NS, NP)
-    self.pr = PyBulletRobot(NS, NP, render=False)
+    self.pr = PyBulletRobot(NS, NP, render=True)
 
   def step(self, phis):
     self.tr.step(phis)
@@ -35,10 +35,16 @@ if __name__ == "__main__":
     #ls = np.array([[0,np.pi/8], [0,np.pi/4]], dtype=np.float32)
     #ls = np.array([[0, 0]] * NS, dtype=np.float32)
 
-    while True:
-        a0, a1, a2, a3 = np.random.rand(4) * np.pi/4
-        phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
-        r.step(phis)
+    a0, a1, a2, a3 = np.random.rand(4) * np.pi/4
+    phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
+    #r.step(phis)
 
-        #for _ in range(100):
-        #    r.pr.stepSimulation()
+    p4 = [0.5, 0., 0.1]
+    r.pr.setTarget(p4)
+
+    while True:
+        r.tr.model.train(p4)
+        phis = r.tr.model.get()
+        print("phis=%s" % phis) #p.eval(session=self.sess))
+
+        r.pr.step(phis)

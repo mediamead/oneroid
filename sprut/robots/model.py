@@ -8,12 +8,15 @@ class TensorRobotModel(object):
     self.NS = NS
     self.NP = NP
 
+    #self.l = tf.placeholder(tf.float32, [self.NS*self.NP, 2])
+    self.l = tf.Variable(tf.zeros([NS*NP, 2]))
+    for i in range(NS*NP):
+        self.l[i][1].is_trainable = False
+    self.model = self.mk_model(self.l)
+
     self.sess = tf.compat.v1.Session()
     init = tf.compat.v1.global_variables_initializer() 
     self.sess.run(init)
-
-    self.l = tf.placeholder("float", [self.NS*self.NP, 2])
-    self.model = self.mk_model(self.l)
 
   # String shifts are proportinal to sine of rotation angles they produce, if actuated independently.
   # If actuated together, they produce larger rotation angles.
@@ -39,7 +42,7 @@ class TensorRobotModel(object):
     z_box = tf.matmul(Ry, z)
 
     # rotation matrix around x vector, for angle l[1]
-    Rx = [[1., 0., 0.], [0., cos_gamma, minus_sin_gamma], [0., sin_gamma, cos_gamma]]
+    Rx = np.identity(3, dtype=np.float32) # [[1., 0., 0.], [0., cos_gamma, minus_sin_gamma], [0., sin_gamma, cos_gamma]]
     x_plate = tf.matmul(Rx, x_box)
     y_plate = tf.matmul(Rx, y_box)
     z_plate = tf.matmul(Rx, z_box)
@@ -62,31 +65,73 @@ class TensorRobotModel(object):
           for _ in range(self.NP):
             pos_plate, _pos_box = self.mk_section(pos_plate, l[i,:])
 
-        return pos_plate
+        return [pos_plate]
 
   def set(self, phis):
-    self.lv = np.zeros((self.NS*self.NP, 2), dtype=np.float32)
+    lv = np.zeros((self.NS, 2), dtype=np.float32)
 
     for i in range(self.NS):
       phix = phis[i][0] / self.NP
       phiy = phis[i][1] / self.NP
+
       sin_phix = np.sin(phix)
       sin_phiy = np.sin(phiy)
 
-      for j in range(self.NP):
-       k = i*self.NP+j
-       self.lv[k][0] = sin_phix
-       self.lv[k][1] = sin_phiy
+      lv[i][0] = sin_phix
+      lv[i][1] = sin_phiy
+
+    self.l.assign(lv)
+
+  def get(self):
+    phis = np.zeros((self.NS, 2), dtype=np.float32)
+    l = self.l.eval(session=self.sess)
+    for i in range(self.NS):
+
+      sin_phix = l[i][0]
+      sin_phiy = l[i][1]
+
+      phix = np.arcsin(sin_phix)
+      phiy = np.arcsin(sin_phiy)
+
+      phis[i][0] = phix
+      phis[i][1] = phiy
+
+    return phis
 
   def run(self):
     #print("# lv.shape=%s lv=%s" % (self.lv.shape, self.lv))
-    pos = self.sess.run(self.model, feed_dict={self.l: self.lv})
+    res = self.sess.run(self.model)
     #print("#TR: pos=%s" % pos)
     #for (p_box, v_box, p_plate, v_plate) in infos:
     #  print("box   p=%s v=%s" % (p_box.flatten(), v_box.flatten()))
     #  print("plate p=%s v=%s" % (p_plate.flatten(), v_plate.flatten()))
-    return pos
+    return res
 
-    #p4 = tf.expand_dims(tf.constant([2., 0., 0.], name="p4"), 1)
+  horizon = tf.expand_dims(tf.constant([1., 0., 1.]), 1)
+
+  def train(self, p_target):
+    p_target = tf.expand_dims(tf.constant(p_target), 1)
+    #cost_v = tf.nn.l2_loss(self.model[1] - self.horizon) # v_plate
+    cost = tf.nn.l2_loss(self.model[0] - p_target) # p_plate
+    #cost = 2/(1/cost_v + 1/cost_p)
+
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.01).minimize(cost)
+    for _ in range(1000):
+        _ , c, lv = self.sess.run([optimizer, cost, self.l])
+        #print(c)
+
+    res = self.run()
+    #print("res=%s" % res)
+    p, x, y, z = res[0]
+
+    #print("p4=%s" % p_target.eval(session=self.sess))
+    print("l=%s" % lv) #p.eval(session=self.sess))
+    print("p=%s" % p) #p.eval(session=self.sess))
+    print("c=%s" % c)
+    #print("l=%s" % self.l.eval(session=self.sess))
+    #print("x=%s" % x.eval(session=self.sess))
+    #print("y=%s" % y.eval(session=self.sess))
+    print("z=%s" % z) #z.eval(session=self.sess))
+
   def close(self):
       self.sess.close()
