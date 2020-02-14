@@ -109,16 +109,16 @@ class TensorRobotModel(object):
     #  print("plate p=%s v=%s" % (p_plate.flatten(), v_plate.flatten()))
     return res
 
-  horizon = tf.expand_dims(tf.constant([1., 0., 0.]), 1)
+  head_orn = tf.expand_dims(tf.constant([0., 0., 1.]), 1)
 
   def train(self, p_target):
     p_target = tf.expand_dims(tf.constant(p_target), 1)
-    cost_v = tf.nn.l2_loss(self.model[0][1] - self.horizon) # v_plate
+    cost_v = tf.nn.l2_loss(self.model[0][3] - self.head_orn) # v_plate
     cost_p = tf.nn.l2_loss(self.model[0][0] - p_target) # distance between p_plate and the target
-    cost = cost_p # 2/(0.0001/cost_v + 1/cost_p)
+    cost = cost_v + cost_p/10
 
     optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.1).minimize(cost)
-    for _ in range(100):
+    for _ in range(1000):
         _ , c, c_p, c_v, lv = self.sess.run([optimizer, cost, cost_p, cost_v, self.l])
         #print(c)
 

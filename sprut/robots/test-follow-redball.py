@@ -45,7 +45,7 @@ if __name__ == "__main__":
     #r.step(phis)
 
     while True:
-        p4 = [0.5 - np.random.rand(), 0., 0.5]
+        p4 = [0.5 - np.random.rand(), 0., 0.4]
         r.pr.setTarget(p4)
 
         for _ in range(5):
