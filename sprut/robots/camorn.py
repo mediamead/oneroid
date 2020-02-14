@@ -37,9 +37,9 @@ def get_horizon_bank(bgr_img):
         lx = (lines[i, 2] - lines[i, 0]) / W
         ly = (lines[i, 3] - lines[i, 1]) / W
         l = np.sqrt(lx**2 + ly**2)
-        #print("W=%d H=%d, lx=%.3f, ly=%.3f, l=%.3f" % (W, H, lx, ly, l))
+        print("W=%d H=%d, lx=%.3f, ly=%.3f, l=%.3f" % (W, H, lx, ly, l))
 
-        if l >= 0.5:
+        if l >= 0.1:
             # long enough, qualifies as a horizon
             if False:
                 # show camera image, overlay red lines over detected segment 
