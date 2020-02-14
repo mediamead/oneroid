@@ -39,7 +39,7 @@ if __name__ == "__main__":
     phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
     #r.step(phis)
 
-    p4 = [0.5, 0., 0.1]
+    p4 = [0.1, 0., 0.03]
     r.pr.setTarget(p4)
 
     while True:

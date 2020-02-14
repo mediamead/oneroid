@@ -214,7 +214,7 @@ class URDFPrinter():
     print("<!-- fixme cage -->", file=f)
 
   def print_target_body(self, f):
-    print(self.target_template % {"xyz": "1 1 1", "r": 0.25}, file=f)
+    print(self.target_template % {"xyz": "1 1 1", "r": 0.05}, file=f)
 
 p = URDFPrinter()
 for NS in [1, 2, 4]:

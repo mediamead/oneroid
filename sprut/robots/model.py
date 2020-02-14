@@ -10,6 +10,8 @@ class TensorRobotModel(object):
 
     #self.l = tf.placeholder(tf.float32, [self.NS*self.NP, 2])
     self.l = tf.Variable(tf.zeros([NS*NP, 2]))
+
+    # Y is boka!
     for i in range(NS*NP):
         self.l[i][1].is_trainable = False
     self.model = self.mk_model(self.l)
@@ -107,17 +109,17 @@ class TensorRobotModel(object):
     #  print("plate p=%s v=%s" % (p_plate.flatten(), v_plate.flatten()))
     return res
 
-  horizon = tf.expand_dims(tf.constant([1., 0., 1.]), 1)
+  horizon = tf.expand_dims(tf.constant([1., 0., 0.]), 1)
 
   def train(self, p_target):
     p_target = tf.expand_dims(tf.constant(p_target), 1)
-    #cost_v = tf.nn.l2_loss(self.model[1] - self.horizon) # v_plate
-    cost = tf.nn.l2_loss(self.model[0] - p_target) # p_plate
-    #cost = 2/(1/cost_v + 1/cost_p)
+    cost_v = tf.nn.l2_loss(self.model[0][1] - self.horizon) # v_plate
+    cost_p = tf.nn.l2_loss(self.model[0][0] - p_target) # p_plate
+    cost = 2/(0.0001/cost_v + 1/cost_p)
 
     optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.01).minimize(cost)
     for _ in range(1000):
-        _ , c, lv = self.sess.run([optimizer, cost, self.l])
+        _ , c, c_p, c_v, lv = self.sess.run([optimizer, cost, cost_p, cost_v, self.l])
         #print(c)
 
     res = self.run()
@@ -127,11 +129,13 @@ class TensorRobotModel(object):
     #print("p4=%s" % p_target.eval(session=self.sess))
     print("l=%s" % lv) #p.eval(session=self.sess))
     print("p=%s" % p) #p.eval(session=self.sess))
-    print("c=%s" % c)
+    print("c=%s c_p=%s c_v=%s" % (c, c_p, c_v))
     #print("l=%s" % self.l.eval(session=self.sess))
     #print("x=%s" % x.eval(session=self.sess))
     #print("y=%s" % y.eval(session=self.sess))
     print("z=%s" % z) #z.eval(session=self.sess))
+
+    del res
 
   def close(self):
       self.sess.close()
