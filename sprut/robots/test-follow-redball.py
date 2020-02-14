@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+"""
+Try to reach red ball jumping on the ceiling
+"""
+
 import numpy as np
 from pybullet_robot import PyBulletRobot
 from tensor_robot import TensorRobot
