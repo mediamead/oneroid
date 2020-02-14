@@ -17,7 +17,7 @@
   </inertial>
   <visual>
     <geometry>
-      <cylinder radius="0.05" length="10"/>
+      <cylinder radius="0.01" length="1"/>
     </geometry>
     <material name="Red"/>
   </visual>

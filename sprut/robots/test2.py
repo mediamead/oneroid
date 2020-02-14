@@ -9,10 +9,11 @@ class HybridRobot(object):
     self.tr = TensorRobot(NS, NP)
     self.pr = PyBulletRobot(NS, NP, render=True)
 
-  def step(self, phis):
-    self.tr.step(phis)
-    self.pr.step(phis)
+  #def step(self, phis):
+  #  self.tr.step(phis)
+  #  self.pr.step(phis)
 
+  def check(self):
     (tr_p, tr_v, tr_u) = self.tr.getHeadcamPVU()
     (pr_p, pr_v, pr_u) = self.pr.getHeadcamPVU()
     
@@ -35,16 +36,18 @@ if __name__ == "__main__":
     #ls = np.array([[0,np.pi/8], [0,np.pi/4]], dtype=np.float32)
     #ls = np.array([[0, 0]] * NS, dtype=np.float32)
 
-    a0, a1, a2, a3 = np.random.rand(4) * np.pi/4
-    phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
+    #a0, a1, a2, a3 = np.random.rand(4) * np.pi/4
+    #phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
     #r.step(phis)
 
-    p4 = [0.1, 0., 0.03]
-    r.pr.setTarget(p4)
-
     while True:
-        r.tr.model.train(p4)
-        phis = r.tr.model.get()
-        print("phis=%s" % phis) #p.eval(session=self.sess))
+        p4 = [0.5 - np.random.rand(), 0., 0.5]
+        r.pr.setTarget(p4)
 
-        r.pr.step(phis)
+        for _ in range(5):
+            r.tr.model.train(p4)
+            phis = r.tr.model.get()
+            print("phis=%s" % phis) #p.eval(session=self.sess))
+            r.pr.step(phis)
+            r.pr.getCameraImage()
+            r.check()

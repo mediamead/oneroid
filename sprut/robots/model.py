@@ -114,11 +114,11 @@ class TensorRobotModel(object):
   def train(self, p_target):
     p_target = tf.expand_dims(tf.constant(p_target), 1)
     cost_v = tf.nn.l2_loss(self.model[0][1] - self.horizon) # v_plate
-    cost_p = tf.nn.l2_loss(self.model[0][0] - p_target) # p_plate
-    cost = 2/(0.0001/cost_v + 1/cost_p)
+    cost_p = tf.nn.l2_loss(self.model[0][0] - p_target) # distance between p_plate and the target
+    cost = cost_p # 2/(0.0001/cost_v + 1/cost_p)
 
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.01).minimize(cost)
-    for _ in range(1000):
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.1).minimize(cost)
+    for _ in range(100):
         _ , c, c_p, c_v, lv = self.sess.run([optimizer, cost, cost_p, cost_v, self.l])
         #print(c)
 
@@ -135,7 +135,7 @@ class TensorRobotModel(object):
     #print("y=%s" % y.eval(session=self.sess))
     print("z=%s" % z) #z.eval(session=self.sess))
 
-    del res
+    del res, p, x, y, z, c, c_p, c_v, lv, cost, cost_p, cost_v, p_target, optimizer
 
   def close(self):
       self.sess.close()
