@@ -177,8 +177,8 @@ class PyBulletRobot(object):
             rot_matrix = np.array(rot_matrix).reshape(3, 3)
             v = rot_matrix.dot((0, 0, 1))
 
-            print("#J%d %f" % (i, js[0]))
-            print("#B%d %s %s" % (i, pos, v))
+            #print("#J%d %f" % (i, js[0]))
+            #print("#B%d %s %s" % (i, pos, v))
 
     # def updateQ(self):
     #     oc = self.getOffCenter()
