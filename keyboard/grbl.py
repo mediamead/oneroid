@@ -17,6 +17,37 @@
 import time
 import serial
 
+def find_ports(SER1="858303033393515190B0", SER2="5583834363335110D111"):
+  while True:
+    print("# ==== ")
+    port1 = port2 = None
+    for n, (port, desc, hwid) in enumerate(sorted(comports()), 1):
+        #(1, ('COM3', 'Arduino Mega 2560 (COM3)', 'USB VID:PID=2341:0042 SER=5583834363335110D111 LOCATION=1-7'))
+        print('# COMPORT %d port=%s desc=%s hwid=%s' % (n, port, desc, hwid))
+        m = re.search(" SER=([^ ]+)", hwid) 
+        if m is None:
+            print("# - NO SERIALNO, ignoring")
+        else:
+            ser = m.group(1)
+            if ser == SER1:
+                port1 =  port
+                print("# + IDENTIFIED AS PORT1: %s" % port1)
+            elif ser == SER2:
+                port2 = port
+                print("# + IDENTIFIED AS PORT2: %s" % port2)
+            else:
+                print("# ? UNKNOWN SERIALNO, ignoring")
+
+    if port1 is not None and port2 is not None:
+        print("# + Found PORT1=%s PORT2=%s" % (port1, port2))
+        return (port1, port2)
+    if port1 is None:
+        print("# ! PORT1 not found")
+    if port2 is None:
+        print("# ! PORT2 not found")
+
+    time.sleep(2)
+
 class Grbl(object):
     def __init__(self, port, speed=115200, homing=False, dry_run=False):
         """
@@ -62,3 +93,9 @@ class Grbl(object):
 
         self.s.write((gcode + "\n").encode())
         #print("#Grbl.send(port=%s, gcode=%s" % (self.port, gcode))
+
+import re, time
+from serial.tools.list_ports import comports
+
+if __name__ == "__main__":
+    find_ports()

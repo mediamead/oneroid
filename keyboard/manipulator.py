@@ -3,10 +3,7 @@
 N_AXIS = 8
 
 import time
-from grbl import Grbl
-
-PORT1 = "/dev/cu.usbmodem145201"
-PORT2 = "/dev/cu.usbmodem145101"
+from grbl import Grbl, find_ports
 
 class Manipulator(object):
     class GrblAxisMap:
@@ -32,7 +29,9 @@ class Manipulator(object):
             cmd = "%s%d" % (m['axis'], pos * m['scale'])
             return m['n'], cmd
 
-    def __init__(self, port1=PORT1, port2=PORT2, speed=115200, homing=False, dry_run=False):
+    def __init__(self, speed=115200, homing=False, dry_run=False):
+        port1, port2 = find_ports()
+
         self.grbls = []
         self.grbls.append(Grbl(port1, speed, homing, dry_run))
         self.grbls.append(Grbl(port2, speed, homing, dry_run))
