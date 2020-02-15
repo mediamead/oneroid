@@ -10,6 +10,8 @@ class TensorRobotModel(object):
 
     self.model = dict()
     self.model['phis'] = tf.Variable(tf.zeros([self.NS, 2]))
+    self.model['p_target'] = tf.Variable(tf.zeros([2]))
+    self.model['z_target'] = tf.Variable(tf.zeros([2]))
 
     # Y is boka! don't train! FIXME
     for i in range(self.NS):
@@ -17,6 +19,12 @@ class TensorRobotModel(object):
     
     self.model['p'], self.model['x'], self.model['y'], self.model['z'] = \
       self.mk_pxyz_model(self.model['phis'])
+
+    # optimize position and orientaton of z-axis
+    cost_z = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
+    cost_p = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
+    self.model['cost1'] = cost_z + cost_p/10
+    self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.2).minimize(self.model['cost1'])
 
     self.sess = tf.compat.v1.Session()
     init = tf.compat.v1.global_variables_initializer() 
@@ -102,31 +110,15 @@ class TensorRobotModel(object):
 
     return phis
 
-  #def run(self):
-    #print("# lv.shape=%s lv=%s" % (self.lv.shape, self.lv))
-    #res = self.sess.run(self.model)
-    #print("#TR: pos=%s" % pos)
-    #for (p_box, v_box, p_plate, v_plate) in infos:
-    #  print("box   p=%s v=%s" % (p_box.flatten(), v_box.flatten()))
-    #  print("plate p=%s v=%s" % (p_plate.flatten(), v_plate.flatten()))
-    #return res
-
   head_orn = tf.expand_dims(tf.constant([0., 0., 1.]), 1)
 
   def get_pxyz(self):
       return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
 
-  def train_homing_v(self, p_target):
-    p_target = tf.expand_dims(tf.constant(p_target), 1)
-
-    cost_v = tf.nn.l2_loss(self.model['z'] - self.head_orn) # v_plate
-    cost_p = tf.nn.l2_loss(self.model['p'] - p_target) # distance between p_plate and the target
-    cost = cost_v + cost_p/10
-
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.2).minimize(cost)
+  def train_homing_v(self, p_target, v_target):
     for _ in range(1000):
         _ , c, p, z, lv = self.sess.run(
-          [optimizer, [cost, cost_p, cost_v], self.model['p'], self.model['z'], self.model['phis']])
+          [self.model['opt1'], self.model['cost1'], self.model['p'], self.model['z'], self.model['phis']])
         #print(c)
 
     print("c=%s" % c)
