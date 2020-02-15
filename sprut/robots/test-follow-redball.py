@@ -48,8 +48,8 @@ if __name__ == "__main__":
         p4 = [0.5 - np.random.rand(), 0., 0.4]
         r.pr.setTarget(p4)
 
-        for _ in range(5):
-            r.tr.model.train(p4)
+        for _ in range(10):
+            r.tr.model.train_homing_v(p4)
             phis = r.tr.model.get()
             print("phis=%s" % phis) #p.eval(session=self.sess))
             r.pr.step(phis)

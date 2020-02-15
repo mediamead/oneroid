@@ -111,13 +111,14 @@ class TensorRobotModel(object):
 
   head_orn = tf.expand_dims(tf.constant([0., 0., 1.]), 1)
 
-  def train(self, p_target):
+  def train_homing_v(self, p_target):
     p_target = tf.expand_dims(tf.constant(p_target), 1)
+
     cost_v = tf.nn.l2_loss(self.model[0][3] - self.head_orn) # v_plate
     cost_p = tf.nn.l2_loss(self.model[0][0] - p_target) # distance between p_plate and the target
     cost = cost_v + cost_p/10
 
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.1).minimize(cost)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate = 0.2).minimize(cost)
     for _ in range(1000):
         _ , c, c_p, c_v, lv = self.sess.run([optimizer, cost, cost_p, cost_v, self.l])
         #print(c)
