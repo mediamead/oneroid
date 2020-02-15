@@ -16,8 +16,7 @@ class TensorRobot:
     self.model.set(phis)
 
   def getHeadcamPVU(self):
-    pos = self.model.run()
-    (p, x, _y, z) = pos[0]
+    (p, x, _y, z) = self.model.get_pxyz()
     return p.flatten(), z.flatten(), x.flatten()
     
   def close(self):
