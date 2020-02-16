@@ -36,7 +36,7 @@ if __name__ == "__main__":
         z_head = p_target - p_head
         r.pr.setTarget(p_target)
 
-        for _ in range(3):
+        for _ in range(10):
             r.tr.model.homing_pzx(p_head, z_head, x_head)
             phis = r.tr.model.get_phis()
 

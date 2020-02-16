@@ -99,7 +99,7 @@ class TensorRobotModel(object):
       self.model['z_target'].assign(z_head)
     ])
 
-    for _ in range(100):
+    for _ in range(10):
         #_ , c, pxyz, phis, dbg = self.sess.run(
         _ , c = self.sess.run(
           [
