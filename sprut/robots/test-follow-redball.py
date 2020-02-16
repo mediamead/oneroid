@@ -35,7 +35,7 @@ class HybridRobot(object):
 
 if __name__ == "__main__":
 
-    r = HybridRobot(4, 4)
+    r = HybridRobot(1, 1)
 
     #ls = np.array([[0,np.pi/8], [0,np.pi/4]], dtype=np.float32)
     #ls = np.array([[0, 0]] * NS, dtype=np.float32)
@@ -44,12 +44,13 @@ if __name__ == "__main__":
     #phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
     #r.step(phis)
 
-    p_head = np.array([0., 0., 0.8])
+    # FIXME make ~ to robot length # p_head = np.array([0., 0., 0.8])
+    p_head = np.array([0., 0., 0.05])
     r.pr.addHeadposMarker(p_head)
 
     while True:
         print("-" * 40)
-        p_target = np.array([0.5 - np.random.rand(), 0., 1.5])
+        p_target = np.array([0, 0.5 - np.random.rand(), 1.5])
         z_target = p_target - p_head
         z_target = z_target / np.linalg.norm(z_target)
         r.pr.setTarget(p_target)

@@ -29,7 +29,7 @@
   </inertial>
   <visual>
     <geometry>
-      <sphere radius="0.150000"/>
+      <sphere radius="0.050000"/>
     </geometry>
     <material name="OrangeT"/>
   </visual>

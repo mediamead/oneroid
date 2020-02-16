@@ -11,7 +11,7 @@ class TensorRobotModel(object):
 
     self.model = dict()
     self.model['phis'] = tf.Variable(tf.zeros([self.NS, 2]))
-    for i in range(self.NS): self.model['phis'][i, 1].is_trainable = False # FIXME
+    for i in range(self.NS): self.model['phis'][i, 0].is_trainable = False # FIXME
 
     self.model['p'], self.model['x'], self.model['y'], self.model['z'] = \
       self.mk_pxyz_model(self.model['phis'])
@@ -22,7 +22,7 @@ class TensorRobotModel(object):
     # optimize position and orientaton of z-axis
     self.model['cost1_z'] = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
     self.model['cost1_p'] = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
-    self.model['cost1'] = self.model['cost1_z'] + self.model['cost1_p']
+    self.model['cost1'] = self.model['cost1_z'] # + self.model['cost1_p']
     self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.01).minimize(self.model['cost1'])
 
     self.sess = tf.compat.v1.Session()
