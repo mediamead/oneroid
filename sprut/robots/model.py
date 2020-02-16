@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import quaternion
 
 JZ = 0.028
 
@@ -49,7 +50,7 @@ class TensorRobotModel(object):
     cos_gamma = tf.math.sqrt(1. - sin_gamma**2)
     
     # rotation matrix around y vector, for angle l[0]
-    Ry = [[cos_beta, 0., sin_beta], [0., 1., 0.], [-sin_beta, 0, cos_beta]]
+    Ry = quaternion.R(y, phi[0])
 
     x_box = tf.matmul(Ry, x)
     y_box = tf.matmul(Ry, y)
@@ -85,7 +86,7 @@ class TensorRobotModel(object):
   #  self.sess.run(self.model['phis'].assign(phis))
 
   def get_phis(self):
-    return self.model['phis'].eval(session=self.sess)
+    return self.model['phis'].eval(session=self.sess) * self.NP
 
   def get_pxyz(self):
     return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
