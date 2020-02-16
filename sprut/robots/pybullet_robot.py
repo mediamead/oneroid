@@ -45,9 +45,6 @@ class PyBulletRobot(object):
         self._loadBody("urdfs/plane.urdf", [0, 0, 0], [0, 0, 0])
         self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
-        #self._loadBody("urdfs/green-line.urdf", [0, 0, 2], [np.pi/2, 0, np.pi/2]) # line on the ceiling
-        self._loadBody("urdfs/green-line.urdf", [1, 0, 0.7], [np.pi/2, 0, 0])
-
         self.bodyId = self._loadBody("urdfs/manipulator-%d-%d.urdf" % (self.NS, self.NP))
         assert(p.getNumJoints(self.bodyId) == self.NS * self.NP * 3 + 1)
 
@@ -72,6 +69,11 @@ class PyBulletRobot(object):
             self.targetId = None
 
         self.targetId = self._loadBody("urdfs/target.urdf", pos)
+
+    def addGreenLine(self, x, _y, z):
+        # FIXME: change length of the line to 2*_y
+        #self._loadBody("urdfs/green-line.urdf", [0, 0, 2], [np.pi/2, 0, np.pi/2]) # line on the ceiling along X axis
+        self._loadBody("urdfs/green-line.urdf", [x, 0, z], [np.pi/2, 0, 0]) # horizontal line line on X wall
 
     def addHeadposMarker(self, pos):
         self._loadBody("urdfs/marker.urdf", pos)

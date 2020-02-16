@@ -20,17 +20,19 @@ if __name__ == "__main__":
     #phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
     #r.step(phis)
 
-    head_zpos = 0.7
-    p_head = np.array([0., 0., head_zpos]) # position of the head is 80cm above origin
-    x_head = np.array([0., 0., -1.]) # orientation of x axis should stay the same
+    line_xpos = 1. # X axis pos of green line
+    line_zpos = 0.7 # Z axis pos of green line
+    line_ypos = 1. # extent of the line along Y axis
+
+    p_head = np.array([0., 0., line_zpos]) # desired position of the head
+    x_head = np.array([0., 0., -1.]) # desired orientation of X axis
 
     r.pr.addHeadposMarker(p_head)
-
-    A = 1.
+    r.pr.addGreenLine(line_xpos, line_ypos, line_zpos)
 
     while True:
         print("-" * 40)
-        p_target = np.array([1., A/2 - A*np.random.rand(), head_zpos])
+        p_target = np.array([line_xpos, line_ypos - 2*line_ypos*np.random.rand(), line_zpos])
         z_head = p_target - p_head
         r.pr.setTarget(p_target)
 
