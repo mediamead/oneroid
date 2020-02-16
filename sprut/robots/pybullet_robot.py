@@ -43,7 +43,7 @@ class PyBulletRobot(object):
         # load urdf and set gravity
         p.resetSimulation()
         self._loadBody("urdfs/plane.urdf", [0, 0, 0], [0, 0, 0])
-        #self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
+        self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
         self._loadBody("urdfs/green-line.urdf", [0, 0, 2], [np.pi/2, 0, np.pi/2])
 

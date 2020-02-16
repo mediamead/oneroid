@@ -18,12 +18,13 @@ class TensorRobotModel(object):
     self.model['pxyz_box'] = pxyz_box
 
     self.model['p_target'] = tf.Variable([[0.]]*3, trainable=False)
+    self.model['x_target'] = tf.Variable([[0.]]*3, trainable=False)
     self.model['z_target'] = tf.Variable([[0.]]*3, trainable=False)
 
     # optimize position and orientaton of z-axis
     self.model['cost1_z'] = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
     self.model['cost1_p'] = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
-    self.model['cost1'] = self.model['cost1_z'] # + self.model['cost1_p']
+    self.model['cost1'] = self.model['cost1_z'] + self.model['cost1_p']
     self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.01).minimize(self.model['cost1'])
 
     self.sess = tf.compat.v1.Session()
@@ -87,22 +88,23 @@ class TensorRobotModel(object):
     #print("get_pxyz=%s" % res)
     #return res[0], res[1], res[2], res[3]
 
-  def train_homing_v(self, p_target, z_target):
-    p_target = np.expand_dims(np.array(p_target).transpose(), axis=1)
-    z_target = np.expand_dims(np.array(z_target).transpose(), axis=1)
+  def homing_pzx(self, p_head, z_head, x_head):
+    p_head = np.expand_dims(np.array(p_head).transpose(), axis=1)
+    z_head = np.expand_dims(np.array(z_head).transpose(), axis=1)
+    x_head = np.expand_dims(np.array(x_head).transpose(), axis=1)
     self.sess.run([
-      self.model['p_target'].assign(p_target),
-      self.model['z_target'].assign(z_target)
+      self.model['p_target'].assign(p_head),
+      self.model['z_target'].assign(z_head),
+      self.model['x_target'].assign(x_head)
     ])
 
     for _ in range(100):
-        #_ , c, pxyz, lv, dbg = self.sess.run(
-        _ , c, pxyz, lv, dbg = self.sess.run(
+        #_ , c, pxyz, phis, dbg = self.sess.run(
+        _ , c = self.sess.run(
           [
             self.model['opt1'],
             [self.model['cost1'], self.model['cost1_p'], self.model['cost1_z']],
-            [self.model['p'], self.model['x'], self.model['y'], self.model['z']],
-            self.model['phis'],
+            #[self.model['p'], self.model['x'], self.model['y'], self.model['z']], self.model['phis'],
             #[self.model['pxyz_box']]
           ])
 
@@ -110,6 +112,8 @@ class TensorRobotModel(object):
     #print("l=%s" % lv)
     #print("p=%s, z=%s" % (pxyz[0], pxyz[3]))
     #print("dbg=%s" % dbg)
+
+    #return pxyz, phis
 
   def close(self):
       self.sess.close()

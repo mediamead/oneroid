@@ -17,15 +17,18 @@ class HybridRobot(object):
   #  self.tr.step(phis)
   #  self.pr.step(phis)
 
-  def check(self):
-    (tr_p, tr_v, tr_u) = self.tr.getHeadcamPVU()
-    (pr_p, pr_v, pr_u) = self.pr.getHeadcamPVU()
+  def check(self): #, pxyz=None):
+#    if pxyz is not None:
+#      (tr_p, tr_z, tr_u) = pxyz[0], pxyz[3], pxyz[1]
+#    else:
+    (tr_p, tr_z, tr_u) = self.tr.getHeadcamPVU()
+    (pr_p, pr_z, pr_u) = self.pr.getHeadcamPVU()
     
     err_p = np.linalg.norm(tr_p - pr_p)
-    err_v = np.linalg.norm(tr_v - pr_v)
+    err_z = np.linalg.norm(tr_z - pr_z)
 
     print("err_p=%f p=%s p=%s" % (err_p, tr_p, pr_p))
-    print("err_v=%f tr_v=%s pr_v=%s" % (err_v, tr_v, pr_v))
+    print("err_z=%f tr_z=%s pr_z=%s" % (err_z, tr_z, pr_z))
 
   def close(self):
     self.tr.close()
@@ -36,7 +39,7 @@ class HybridRobot(object):
 if __name__ == "__main__":
 
     r = HybridRobot(4, 4)
-    phis = np.array([[np.pi/16, np.pi/16]] * 4, dtype=np.float32)
+    phis = np.array([[np.pi/10, np.pi/16], [np.pi/8, np.pi/20]] * 2, dtype=np.float32)
 
     print("phis (to be assigned to model vars)=%s" % phis)
     r.tr.model.set(phis)
