@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
         for _ in range(10):
             r.tr.model.train_homing_v(p_head, z_target)
-            phis = r.tr.model.get()
+            phis = r.tr.model.get_phis()
             #print("phis=%s" % phis) #p.eval(session=self.sess))
             r.pr.step(phis)
             r.pr.getCameraImage()

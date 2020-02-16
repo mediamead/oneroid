@@ -39,22 +39,24 @@ class TensorRobotModel(object):
     p_box = p + JZ * z
 
     # create Rxy rotation matrix
-    sin_beta = phi[0]
-    sin_gamma = phi[1]
+    beta = phi[0]
+    gamma = phi[1]
+    sin_beta = tf.math.sin(beta)
+    sin_gamma = tf.math.sin(gamma)
+    #cos_beta = tf.math.cos(beta)
+    #cos_gamma = tf.math.cos(gamma)
     cos_beta = tf.math.sqrt(1. - sin_beta**2)
     cos_gamma = tf.math.sqrt(1. - sin_gamma**2)
-    minus_sin_beta = tf.negative(sin_beta)
-    minus_sin_gamma = tf.negative(sin_gamma)
-
+    
     # rotation matrix around y vector, for angle l[0]
-    Ry = [[cos_beta, 0., sin_beta], [0., 1., 0.], [minus_sin_beta, 0, cos_beta]]
+    Ry = [[cos_beta, 0., sin_beta], [0., 1., 0.], [-sin_beta, 0, cos_beta]]
 
     x_box = tf.matmul(Ry, x)
     y_box = tf.matmul(Ry, y)
     z_box = tf.matmul(Ry, z)
 
     # rotation matrix around x vector, for angle l[1]
-    Rx = np.identity(3, dtype=np.float32) # [[1., 0., 0.], [0., cos_gamma, minus_sin_gamma], [0., sin_gamma, cos_gamma]]
+    Rx = np.identity(3, dtype=np.float32) # [[1., 0., 0.], [0., cos_gamma, -sin_gamma], [0., sin_gamma, cos_gamma]]
     x_plate = tf.matmul(Rx, x_box)
     y_plate = tf.matmul(Rx, y_box)
     z_plate = tf.matmul(Rx, z_box)
@@ -79,39 +81,14 @@ class TensorRobotModel(object):
 
         return pos_plate
 
-  def set(self, phis):
-    lv = np.zeros((self.NS, 2), dtype=np.float32)
+  #def set(self, phis):
+  #  self.sess.run(self.model['phis'].assign(phis))
 
-    for i in range(self.NS):
-      phix = phis[i][0] / self.NP
-      phiy = phis[i][1] / self.NP
-
-      sin_phix = np.sin(phix)
-      sin_phiy = np.sin(phiy)
-
-      lv[i][0] = sin_phix
-      lv[i][1] = sin_phiy
-
-      self.sess.run(self.model['phis'].assign(lv))
-
-  def get(self):
-    phis = np.zeros((self.NS, 2), dtype=np.float32)
-    lv = self.model['phis'].eval(session=self.sess)
-
-    for i in range(self.NS):
-      sin_phix = lv[i][0]
-      sin_phiy = lv[i][1]
-
-      phix = np.arcsin(sin_phix) * self.NP
-      phiy = np.arcsin(sin_phiy) * self.NP
-
-      phis[i][0] = phix
-      phis[i][1] = phiy
-
-    return phis
+  def get_phis(self):
+    return self.model['phis'].eval(session=self.sess)
 
   def get_pxyz(self):
-      return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
+    return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
 
   def train_homing_v(self, p_target, z_target):
     p_target = np.expand_dims(np.array(p_target).transpose(), axis=1)
