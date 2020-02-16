@@ -75,7 +75,7 @@ class TensorRobotModel(object):
         return pos_plate, pxyz_box
 
   def set(self, phis):
-    phis = tf.expand_dims(phis, 0)
+    #phis = tf.expand_dims(phis, 0)
     self.sess.run(self.model['phis'].assign(phis / self.NP))
 
   def get_phis(self):

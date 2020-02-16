@@ -35,12 +35,13 @@ class HybridRobot(object):
 
 if __name__ == "__main__":
 
-    r = HybridRobot(1, 1)
-    phis = np.array([0., np.pi/4], dtype=np.float32)
-    print("phis=%s" % phis)
+    r = HybridRobot(4, 4)
+    phis = np.array([[np.pi/16, np.pi/16]] * 4, dtype=np.float32)
+
+    print("phis (to be assigned to model vars)=%s" % phis)
     r.tr.model.set(phis)
     phis = r.tr.model.get_phis()
-    print("phis=%s" % phis)
+    print("phis (read from model vars)=%s" % phis)
 
     r.pr.step(phis)
     r.pr.getCameraImage()
