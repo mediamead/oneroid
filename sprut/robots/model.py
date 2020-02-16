@@ -11,7 +11,8 @@ class TensorRobotModel(object):
 
     self.model = dict()
     self.model['phis'] = tf.Variable(tf.zeros([self.NS, 2]))
-    
+    for i in range(self.NS): self.model['phis'][i, 1].is_trainable = False # FIXME
+
     self.model['p'], self.model['x'], self.model['y'], self.model['z'] = \
       self.mk_pxyz_model(self.model['phis'])
 
