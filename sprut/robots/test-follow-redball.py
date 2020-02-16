@@ -49,12 +49,12 @@ if __name__ == "__main__":
 
     while True:
         print("-" * 40)
-        p_target = np.array([0.5 - np.random.rand(), 0., 1.5])
+        p_target = np.array([0.5 - np.random.rand(), 0.5 - np.random.rand(), 1.5])
         z_target = p_target - p_head
         z_target = z_target / np.linalg.norm(z_target)
         r.pr.setTarget(p_target)
 
-        for _ in range(10):
+        for _ in range(3):
             r.tr.model.train_homing_v(p_head, z_target)
             phis = r.tr.model.get_phis()
             #print("phis=%s" % phis) #p.eval(session=self.sess))
