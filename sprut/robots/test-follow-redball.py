@@ -35,7 +35,7 @@ class HybridRobot(object):
 
 if __name__ == "__main__":
 
-    r = HybridRobot(4, 1)
+    r = HybridRobot(4, 2)
 
     #ls = np.array([[0,np.pi/8], [0,np.pi/4]], dtype=np.float32)
     #ls = np.array([[0, 0]] * NS, dtype=np.float32)
@@ -44,17 +44,19 @@ if __name__ == "__main__":
     #phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
     #r.step(phis)
 
-    z_target = [0., 0., 1.]
+    p_head = np.array([0., 0., 0.2])
 
     while True:
         print("-" * 40)
-        p_target = [0.5 - np.random.rand(), 0., 0.4]
+        p_target = np.array([0.5 - np.random.rand(), 0., 1.5])
+        z_target = p_target - p_head
+        z_target = z_target / np.linalg.norm(z_target)
         r.pr.setTarget(p_target)
 
         for _ in range(10):
-            r.tr.model.train_homing_v(p_target, z_target)
+            r.tr.model.train_homing_v(p_head, z_target)
             phis = r.tr.model.get()
             #print("phis=%s" % phis) #p.eval(session=self.sess))
             r.pr.step(phis)
             r.pr.getCameraImage()
-            #r.check()
+            r.check()

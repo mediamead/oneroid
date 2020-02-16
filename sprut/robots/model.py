@@ -23,7 +23,7 @@ class TensorRobotModel(object):
     # optimize position and orientaton of z-axis
     self.model['cost1_z'] = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
     self.model['cost1_p'] = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
-    self.model['cost1'] = self.model['cost1_p'] # self.model['cost1_z']
+    self.model['cost1'] = self.model['cost1_z'] # self.model['cost1_p']/10 +
     self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.1).minimize(self.model['cost1'])
 
     self.sess = tf.compat.v1.Session()
