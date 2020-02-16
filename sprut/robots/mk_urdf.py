@@ -217,7 +217,7 @@ class URDFPrinter():
     print(self.target_template % {"xyz": "1 1 1", "r": 0.05}, file=f)
 
 p = URDFPrinter()
-for NS in [1, 2, 3, 4]:
+for NS in [1, 2, 3, 4, 8]:
  for NP in [1, 2, 3, 4]:
   p.print_manipulator(open("urdfs/manipulator-%d-%d.urdf" % (NS, NP), "w"), NS, NP)
 p.print_target(open("urdfs/target.urdf", "w"))
