@@ -20,8 +20,9 @@ if __name__ == "__main__":
     #phis = np.array([[a0, 0], [a1, 0], [a2, 0], [a3, 0]], dtype=np.float32)
     #r.step(phis)
 
-    p_head = np.array([0., 0., 0.8]) # position of the head is 80cm above origin
-    x_head = np.array([1., 0., 0]) # orientation of x axis should stay the same
+    head_zpos = 0.7
+    p_head = np.array([0., 0., head_zpos]) # position of the head is 80cm above origin
+    x_head = np.array([0., 0., -1.]) # orientation of x axis should stay the same
 
     r.pr.addHeadposMarker(p_head)
 
@@ -29,9 +30,8 @@ if __name__ == "__main__":
 
     while True:
         print("-" * 40)
-        p_target = np.array([A/2 - A*np.random.rand(), A/2 - A*np.random.rand(), 1.5])
+        p_target = np.array([1., A/2 - A*np.random.rand(), head_zpos])
         z_head = p_target - p_head
-        z_head = z_head / np.linalg.norm(z_head)
         r.pr.setTarget(p_target)
 
         for _ in range(3):

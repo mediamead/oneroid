@@ -22,9 +22,9 @@ class TensorRobotModel(object):
     self.model['z_target'] = tf.Variable([[0.]]*3, trainable=False)
 
     # optimize position and orientaton of z-axis
+    self.model['cost1_p'] = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
     self.model['cost1_x'] = tf.nn.l2_loss(self.model['x'] - self.model['x_target'])
     self.model['cost1_z'] = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
-    self.model['cost1_p'] = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
     self.model['cost1'] = self.model['cost1_x'] + self.model['cost1_z'] + self.model['cost1_p']
     self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.01).minimize(self.model['cost1'])
 
@@ -91,12 +91,12 @@ class TensorRobotModel(object):
 
   def homing_pzx(self, p_head, z_head, x_head):
     p_head = np.expand_dims(np.array(p_head).transpose(), axis=1)
-    z_head = np.expand_dims(np.array(z_head).transpose(), axis=1)
-    x_head = np.expand_dims(np.array(x_head).transpose(), axis=1)
+    x_head = np.expand_dims(np.array(x_head).transpose(), axis=1) / np.linalg.norm(x_head)
+    z_head = np.expand_dims(np.array(z_head).transpose(), axis=1) / np.linalg.norm(z_head)
     self.sess.run([
       self.model['p_target'].assign(p_head),
-      self.model['z_target'].assign(z_head),
-      self.model['x_target'].assign(x_head)
+      self.model['x_target'].assign(x_head),
+      self.model['z_target'].assign(z_head)
     ])
 
     for _ in range(100):
@@ -104,7 +104,7 @@ class TensorRobotModel(object):
         _ , c = self.sess.run(
           [
             self.model['opt1'],
-            [self.model['cost1'], self.model['cost1_p'], self.model['cost1_z']],
+            [self.model['cost1'], self.model['cost1_p'], self.model['cost1_x'], self.model['cost1_z']],
             #[self.model['p'], self.model['x'], self.model['y'], self.model['z']], self.model['phis'],
             #[self.model['pxyz_box']]
           ])
