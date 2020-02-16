@@ -72,6 +72,9 @@ class PyBulletRobot(object):
 
         self.targetId = self._loadBody("urdfs/target.urdf", pos)
 
+    def addHeadposMarker(self, pos):
+        self._loadBody("urdfs/marker.urdf", pos)
+
 # --------------------------------------------------------------------
 
     def _setJointMotorPosition(self, joint, pos):

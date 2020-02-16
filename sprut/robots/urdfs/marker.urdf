@@ -10,8 +10,8 @@
   <material name="Grey">
     <color rgba="0.2 0.2 0.2 1.0"/>
   </material>
-  <material name="Orange">
-    <color rgba="1.0 0.423529411765 0.0392156862745 1.0"/>
+  <material name="OrangeT">
+    <color rgba="1.0 0.423529411765 0.0392156862745 0.1"/>
   </material>
   <material name="Blue">
   <color rgba="0.0 0.0 1 1.0"/>      
@@ -29,9 +29,9 @@
   </inertial>
   <visual>
     <geometry>
-      <sphere radius="0.050000"/>
+      <sphere radius="0.150000"/>
     </geometry>
-    <material name="Red"/>
+    <material name="OrangeT"/>
   </visual>
 </link>
 
