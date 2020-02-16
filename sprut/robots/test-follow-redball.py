@@ -21,10 +21,10 @@ if __name__ == "__main__":
     #r.step(phis)
 
     line_xpos = 1. # X axis pos of green line
-    line_zpos = 0.35 # Z axis pos of green line
-    line_ypos = 1. # extent of the line along Y axis
+    line_zpos = 0.7 # Z axis pos of green line
+    line_ypos = 1.5 # extent of the line along Y axis
 
-    p_head = np.array([0., 0., line_zpos]) # desired position of the head
+    p_head = np.array([0.2, 0., line_zpos]) # desired position of the head
     x_head = np.array([0., 0., -1.]) # desired orientation of X axis
     y_head = np.array([0., 1., 0.]) # desired orientation of X axis
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         z_head = p_target - p_head
         r.pr.setTarget(p_target)
 
-        for _ in range(10):
+        for _ in range(25):
             r.tr.model.homing_pxyz(p_head, x_head, y_head, z_head)
             phis = r.tr.model.get_phis()
 

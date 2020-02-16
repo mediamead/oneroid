@@ -27,7 +27,7 @@ class TensorRobotModel(object):
     self.model['cost1_x'] = tf.nn.l2_loss(self.model['x'] - self.model['x_target'])
     self.model['cost1_y'] = tf.nn.l2_loss(self.model['y'] - self.model['y_target'])
     self.model['cost1_z'] = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
-    self.model['cost1'] = self.model['cost1_y'] + self.model['cost1_z'] + self.model['cost1_p'] # no X axis homing
+    self.model['cost1'] = 0.5*self.model['cost1_y'] + self.model['cost1_z'] + 0.1*self.model['cost1_p'] # no X axis homing
     self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.025).minimize(self.model['cost1'])
 
     self.sess = tf.compat.v1.Session()
