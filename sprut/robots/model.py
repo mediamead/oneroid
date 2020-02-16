@@ -13,8 +13,9 @@ class TensorRobotModel(object):
     self.model['phis'] = tf.Variable(tf.zeros([self.NS, 2]))
     for i in range(self.NS): self.model['phis'][i, 0].is_trainable = False # FIXME
 
-    self.model['p'], self.model['x'], self.model['y'], self.model['z'] = \
-      self.mk_pxyz_model(self.model['phis'])
+    pos_plate, pxyz_box = self.mk_pxyz_model(self.model['phis'])
+    self.model['p'], self.model['x'], self.model['y'], self.model['z'] = pos_plate
+    self.model['pxyz_box'] = pxyz_box
 
     self.model['p_target'] = tf.Variable([[0.]]*3, trainable=False)
     self.model['z_target'] = tf.Variable([[0.]]*3, trainable=False)
@@ -43,13 +44,12 @@ class TensorRobotModel(object):
 
     # rotation matrix around y vector, for angle l[0]
     Ry = quaternion.R(y, beta)
-
     x_box = tf.matmul(Ry, x)
     y_box = tf.matmul(Ry, y)
     z_box = tf.matmul(Ry, z)
 
     # rotation matrix around x vector, for angle l[1]
-    Rx = quaternion.R(x, -gamma)
+    Rx = quaternion.R(x_box, -gamma)
     x_plate = tf.matmul(Rx, x_box)
     y_plate = tf.matmul(Rx, y_box)
     z_plate = tf.matmul(Rx, z_box)
@@ -57,12 +57,12 @@ class TensorRobotModel(object):
     # translation from kardan to the next plate
     p_plate = p_box + JZ * z_plate
     
-    return p_plate, x_plate, y_plate, z_plate
+    return [p_plate, x_plate, y_plate, z_plate], [p_box, x_box, y_box, z_box]
 
   def mk_pxyz_model(self, l):
         # base position
         p0 = tf.expand_dims(tf.constant([0., 0., 0.], name="p0"), 1)
-        x0 = tf.expand_dims(tf.constant([1., 0., 1.], name="x0"), 1)
+        x0 = tf.expand_dims(tf.constant([1., 0., 0.], name="x0"), 1)
         y0 = tf.expand_dims(tf.constant([0., 1., 0.], name="y0"), 1)
         z0 = tf.expand_dims(tf.constant([0., 0., 1.], name="z0"), 1)
 
@@ -70,18 +70,22 @@ class TensorRobotModel(object):
 
         for i in range(self.NS):
           for _ in range(self.NP):
-            pos_plate = self.mk_pxyz_model_section(pos_plate, l[i,:])
+            pos_plate, pxyz_box = self.mk_pxyz_model_section(pos_plate, l[i,:])
 
-        return pos_plate
+        return pos_plate, pxyz_box
 
-  #def set(self, phis):
-  #  self.sess.run(self.model['phis'].assign(phis))
+  def set(self, phis):
+    phis = tf.expand_dims(phis, 0)
+    self.sess.run(self.model['phis'].assign(phis / self.NP))
 
   def get_phis(self):
     return self.model['phis'].eval(session=self.sess) * self.NP
 
   def get_pxyz(self):
     return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
+    #res = self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z'], self.model['pxyz_box']])
+    #print("get_pxyz=%s" % res)
+    #return res[0], res[1], res[2], res[3]
 
   def train_homing_v(self, p_target, z_target):
     p_target = np.expand_dims(np.array(p_target).transpose(), axis=1)
@@ -92,13 +96,14 @@ class TensorRobotModel(object):
     ])
 
     for _ in range(100):
-        _ , c, pxyz, lv, _dbg = self.sess.run(
+        #_ , c, pxyz, lv, dbg = self.sess.run(
+        _ , c, pxyz, lv, dbg = self.sess.run(
           [
             self.model['opt1'],
             [self.model['cost1'], self.model['cost1_p'], self.model['cost1_z']],
             [self.model['p'], self.model['x'], self.model['y'], self.model['z']],
             self.model['phis'],
-            []
+            #[self.model['pxyz_box']]
           ])
 
     print("c=%s" % c)
