@@ -10,9 +10,6 @@ class TensorRobotModel(object):
 
     self.model = dict()
     self.model['phis'] = tf.Variable(tf.zeros([self.NS, 2]))
-    self.model['p_target'] = tf.Variable(tf.zeros([2]))
-    self.model['z_target'] = tf.Variable(tf.zeros([2]))
-
     # Y is boka! don't train! FIXME
     for i in range(self.NS):
         self.model['phis'][i, 1].is_trainable = False
@@ -20,11 +17,14 @@ class TensorRobotModel(object):
     self.model['p'], self.model['x'], self.model['y'], self.model['z'] = \
       self.mk_pxyz_model(self.model['phis'])
 
+    self.model['p_target'] = tf.Variable([[0.]]*3, trainable=False)
+    self.model['z_target'] = tf.Variable([[0.]]*3, trainable=False)
+
     # optimize position and orientaton of z-axis
-    cost_z = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
-    cost_p = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
-    self.model['cost1'] = cost_z + cost_p/10
-    self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.2).minimize(self.model['cost1'])
+    self.model['cost1_z'] = tf.nn.l2_loss(self.model['z'] - self.model['z_target'])
+    self.model['cost1_p'] = tf.nn.l2_loss(self.model['p'] - self.model['p_target'])
+    self.model['cost1'] = self.model['cost1_p'] # self.model['cost1_z']
+    self.model['opt1'] = tf.train.GradientDescentOptimizer(learning_rate = 0.1).minimize(self.model['cost1'])
 
     self.sess = tf.compat.v1.Session()
     init = tf.compat.v1.global_variables_initializer() 
@@ -62,7 +62,7 @@ class TensorRobotModel(object):
     # translation from kardan to the next plate
     p_plate = p_box + JZ * z_plate
     
-    return [p_plate, x_plate, y_plate, z_plate]
+    return p_plate, x_plate, y_plate, z_plate
 
   def mk_pxyz_model(self, l):
         # base position
@@ -92,7 +92,7 @@ class TensorRobotModel(object):
       lv[i][0] = sin_phix
       lv[i][1] = sin_phiy
 
-    self.model['phis'].assign(lv)
+      self.sess.run(self.model['phis'].assign(lv))
 
   def get(self):
     phis = np.zeros((self.NS, 2), dtype=np.float32)
@@ -110,20 +110,31 @@ class TensorRobotModel(object):
 
     return phis
 
-  head_orn = tf.expand_dims(tf.constant([0., 0., 1.]), 1)
-
   def get_pxyz(self):
       return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
 
-  def train_homing_v(self, p_target, v_target):
+  def train_homing_v(self, p_target, z_target):
+    p_target = np.expand_dims(np.array(p_target).transpose(), axis=1)
+    z_target = np.expand_dims(np.array(z_target).transpose(), axis=1)
+    self.sess.run([
+      self.model['p_target'].assign(p_target),
+      self.model['z_target'].assign(z_target)
+    ])
+
     for _ in range(1000):
-        _ , c, p, z, lv = self.sess.run(
-          [self.model['opt1'], self.model['cost1'], self.model['p'], self.model['z'], self.model['phis']])
-        #print(c)
+        _ , c, pxyz, lv, _dbg = self.sess.run(
+          [
+            self.model['opt1'],
+            [self.model['cost1'], self.model['cost1_p'], self.model['cost1_z']],
+            [self.model['p'], self.model['x'], self.model['y'], self.model['z']],
+            self.model['phis'],
+            []
+          ])
 
     print("c=%s" % c)
-    print("l=%s" % lv)
-    print("p=%s, z=%s" % (p, z))
+    #print("l=%s" % lv)
+    #print("p=%s, z=%s" % (pxyz[0], pxyz[3]))
+    #print("dbg=%s" % dbg)
 
   def close(self):
       self.sess.close()
