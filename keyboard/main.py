@@ -1,97 +1,28 @@
 #!/usr/bin/env python
 
+import time
 from KBHit import KBHit
 from manipulator import Manipulator
+from scenario import Scenario
 
-#print("zc/xs/bm/nh - движение новой точки по X/Y/Z/A осям")
-#print("Esc - сбросить текущую вернуться к последней точке в сценарии")
-#print("Enter - добавить новую точку в сценарий")
-# print("Нажии")
-
-class AxesPos:
-    """
-    Encapsulates information about position of multiple axes and
-    an optional comment describing that position
-    """
-
-    def __init__(self, pos, nline=None, comment=None):
-        self.nline = nline
-        self.pos = list(pos)
-        self.comment = comment
-    
-    def clone(self):
-        return AxesPos(self.pos)
-
-    def apply_delta(self, axis, delta):
-        new_pos = self.pos[axis] + delta
-        if new_pos >= -45 and new_pos <= 45:
-            self.pos[axis] = new_pos
-        else:
-            # limit exceeded
-            print('\a')
-
-    def __str__(self):
-        """
-        Returns a string specifying coordinates for all axes
-        """
-        return str(self.pos)
-
-class Scenario:
-    """
-    Encapsulates information about sequence of positions we want the manipulator to move between
-    """
-
-    def __init__(self, home_pos):
-        self.positions = [AxesPos(home_pos, nline=0, comment="HOME")]
-
-    def get_next_nline(self):
-        return len(self.positions)
-
-    def add_pos(self, new_pos):
-        new_pos.nline = self.get_next_nline()
-        self.positions.append(new_pos)
-        #print("#FIXME: SAVE SCENARIO LINE %d: %s" % (nline, new_pos))
-
-    def get_pos(self, nline):
-        return self.positions[nline]
-
-    def get_first_pos(self):
-        return self.positions[0]
-
-    def get_last_pos(self):
-        return self.positions[-1]
-
-    def print(self):
-        print("=== BEGIN ===")
-        for i in range(len(self.positions)):
-            print("%3d: %s" % (i, self.positions[i].pos))
-        print("=== END ===")
-
-kb = KBHit()
-
-m = Manipulator(homing=False, dry_run=False)
-scenario = Scenario(m.get_pos())
-
-for pos in [
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0],
-   [0, 0, 0, 0, 0, 0, 0, 0]
-  ]:
-    scenario.add_pos(AxesPos(pos))
+print("qa/ws/ed/rf/tg/yh/uj/ik - движение точки")
+print("n - перейти к следующему сценарию")
+print("V - сохранить сценарий")
+print("L - перезагрузить сценарий")
+print("? - показать точки текущего сценария")
 
 def handle_keyboard(ch):
-    """
-    Returns axis movement tuple (axis, delta) in response to keypresses.
-    Keys (zc/xs/bm/nh) correspond to X/Y/Z/A axes.
-    Returns None if none of these keys were pressed.
-    Lowercase - 1 step, uppercase - 10.
-    """
+    # gotopos
+    if ch >= '0' and ch <= '9':
+        return ('goto', ord(ch) - ord('0'))
+    elif ch == '?':
+        return ('dump', None)
+    elif ch == 'n':
+        return ('next-scenario', None)
+    elif ch == 'V':
+        return ('write-scenario', None)
+    elif ch == 'L':
+        return ('reload-scenario', None)
 
     if ch.isupper():
         step = 10
@@ -150,12 +81,6 @@ def handle_keyboard(ch):
     elif ch == 'k':
         axis = 7
         delta = -step
-    # gotopos
-    elif ch >= '0' and ch <= '9':
-        return ('goto', ord(ch) - ord('0'))
-    # ?
-    elif ch == '?':
-        return ('dump', None)
     else:
         print("#KBHIT %d" % ord(ch))
         return (None, None)
@@ -163,15 +88,21 @@ def handle_keyboard(ch):
     # fall-through from axis movement commands
     return ('move', [axis, delta])
 
-# FIXME: load saved scenario
+kb = KBHit()
 
+m = Manipulator(homing=False, dry_run=False)
+scenarios = [Scenario('scenario-1.csv'), Scenario('scenario-2.csv'), Scenario('scenario-3.csv')]
+curr_scenario = 0
+
+scenario = scenarios[curr_scenario]
 pos = scenario.get_first_pos()
+m.move(pos.pos)
 
 while True:
-    print("# %s" % pos)
+    print("# %s line %d %s" % (scenario.file, pos.nline, pos.pos))
 
     while not kb.kbhit():
-        pass
+        time.sleep(0.1)
 
     ch = kb.getch()
     cmd, cmd_params = handle_keyboard(ch)
@@ -179,16 +110,21 @@ while True:
         if cmd_params:
             pos.apply_delta(cmd_params[0], cmd_params[1])
             m.move(pos.pos)
-        #elif ord(ch) == 27:  # ESC
-        #    next_pos = scenario.get_last_pos().clone()
-        #    m.move(next_pos.pos)
-        #elif ord(ch) == 10:  # ENTER
-        #    scenario.add_pos(next_pos)
-        #    next_pos = scenario.get_last_pos().clone()
     elif cmd == 'dump': # dump scenario
         scenario.print()
-        print("#CURRENT POS: nline=%d pos=%s" % (pos.nline, pos.pos))
     elif cmd == 'goto':
         pos = scenario.get_pos(cmd_params)
         m.move(pos.pos)
-        print("#GOTO POS: nline=%d pos=%s" % (pos.nline, pos.pos))
+    elif cmd == 'next-scenario':
+        curr_scenario = (curr_scenario + 1) % len(scenarios)
+        scenario = scenarios[curr_scenario]
+        scenario.print()
+        pos = scenario.get_first_pos()
+        m.move(pos.pos)
+    elif cmd == 'write-scenario':
+        scenario.save()
+    elif cmd == 'reload-scenario':
+        scenario.load()
+        scenario.print()
+        pos = scenario.get_first_pos()
+        m.move(pos.pos)
