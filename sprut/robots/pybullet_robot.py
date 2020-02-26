@@ -7,15 +7,12 @@ import numpy as np
 
 import cv2
 
-NP = 4 # number of plates per section
-NJ = 4 # number of sections
-
 #H = 720
 #W = 1280
-#H = 144
-#W = 256
-H = 200
-W = 200
+H = 144
+W = 256
+#H = 200
+#W = 200
 # https://www.chiefdelphi.com/t/horizontal-fov-of-microsoft-lifecam-cinema/156204/7
 HFOV = 64.4
 
@@ -23,10 +20,13 @@ import os
 
 BASEDIR = os.path.dirname(__file__)
 
-class Robot:
+class PyBulletRobot(object):
 
-    def __init__(self, render):
-        print("*** Robot(render=%s) inited ***" % render)
+    def __init__(self, NS, NP, render=False):
+        self.NS = NS
+        self.NP = NP
+
+        print("*** Initializing PyBulletRobot(ns=%d, render=%s) ..." % (self.NS, render))
         # Start pybullet simulation
         if render:
             p.connect(p.GUI)
@@ -42,12 +42,11 @@ class Robot:
 
         # load urdf and set gravity
         p.resetSimulation()
+        self._loadBody("urdfs/plane.urdf", [0, 0, 0], [0, 0, 0])
+        self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
-        self._loadBody("plane.urdf", [0, 0, 0], [0, 0, 0])
-        self._loadBody("plane.urdf", [0, 0, 3], [0, np.pi, 0])
-
-        self.bodyId = self._loadBody("manipulator.urdf")
-        assert(p.getNumJoints(self.bodyId) == NJ * NP * 2 + 1)
+        self.bodyId = self._loadBody("urdfs/manipulator-%d-%d.urdf" % (self.NS, self.NP))
+        assert(p.getNumJoints(self.bodyId) == self.NS * self.NP * 3 + 1)
 
         # get id of link the camera is attached to -- the very last joint of the body
         self.cameraLinkId = p.getNumJoints(self.bodyId) - 1
@@ -55,6 +54,7 @@ class Robot:
         self.projection_matrix = p.computeProjectionMatrixFOV(HFOV, aspect, 0.1, 4)
 
         self.targetId = None
+        print("*** Initializing PyBulletRobot() done")
 
     def _loadBody(self, f, startPos=[0, 0, 0], startOrientationEuler=[0, 0, 0]):
         startOrientation = p.getQuaternionFromEuler(startOrientationEuler)
@@ -68,7 +68,15 @@ class Robot:
             p.removeBody(self.targetId)
             self.targetId = None
 
-        self.targetId = self._loadBody("target.urdf", pos)
+        self.targetId = self._loadBody("urdfs/target.urdf", pos)
+
+    def addGreenLine(self, x, _y, z):
+        # FIXME: change length of the line to 2*_y
+        #self._loadBody("urdfs/green-line.urdf", [0, 0, 2], [np.pi/2, 0, np.pi/2]) # line on the ceiling along X axis
+        self._loadBody("urdfs/green-line.urdf", [x, 0, z], [np.pi/2, 0, 0]) # horizontal line line on X wall
+
+    def addHeadposMarker(self, pos):
+        self._loadBody("urdfs/marker.urdf", pos)
 
 # --------------------------------------------------------------------
 
@@ -83,17 +91,18 @@ class Robot:
         #                        positionGain=1000,
         #                        velocityGain=0,
         #                        maxVelocity=5)
+        ##("## PYBULLETROBOT: joint=%d pos=%.3f" % (joint, pos))
 
     def _setJointPosition(self, sec, pos0, pos1):
-        pos0 /= NP
-        pos1 /= NP
+        pos0 /= self.NP
+        pos1 /= self.NP
 
-        for p in range(NP):
-            j = (sec * NP + p) * 2
-            if p != 0:
-                self._setJointMotorPosition(j, pos0)
-            if p != NP-1:
-                self._setJointMotorPosition(j + 1, pos1)
+        for p in range(self.NP):
+            j = (sec * self.NP + p) * 3
+          #if p != 0:
+            self._setJointMotorPosition(j, pos0)
+          #if p != NP-1:
+            self._setJointMotorPosition(j + 1, pos1)
 
 # --------------------------------------------------------------------
 
@@ -164,13 +173,18 @@ class Robot:
             R += [r[0], r[1]] # take only XJ proj
         return np.linalg.norm(R)
 
-    # def _print_joints_pos(self):
-    #     for i in range(p.getNumJoints(self.bodyId)):
-    #         js = p.getJointState(self.bodyId, i)
-    #         #print("%4.1f/%4.1f " % (js[0], js[1]), end="")
-    #         print("%4.3f " % (js[0]), end="")
-    #     print()
-    #
+    def _print_joints_pos(self):
+        for i in range(p.getNumJoints(self.bodyId)):
+            js = p.getJointState(self.bodyId, i)
+            pos, orn, _, _, _, _ = p.getLinkState(self.bodyId, i)
+
+            rot_matrix = p.getMatrixFromQuaternion(orn)
+            rot_matrix = np.array(rot_matrix).reshape(3, 3)
+            v = rot_matrix.dot((0, 0, 1))
+
+            #print("#J%d %f" % (i, js[0]))
+            #print("#B%d %s %s" % (i, pos, v))
+
     # def updateQ(self):
     #     oc = self.getOffCenter()
     #     if oc is not None:
@@ -196,13 +210,10 @@ class Robot:
     #     self.dy = dy
     #     self.dr = dr
 
-    def get_nphis(self):
-        return NJ
-
     # step through the simluation
     def step(self, phis):
-        for i in range(NJ):
-            self._setJointPosition(i, phis[i*2], phis[i*2+1])
+        for i in range(self.NS):
+            self._setJointPosition(i, phis[i, 0], phis[i, 1])
         p.stepSimulation()
 
         #t += timeStep
@@ -210,4 +221,16 @@ class Robot:
 
     def close(self):
         p.disconnect()
-        print("*** Robot() closed ***")
+        print("*** PyBulletRobot() closed ***")
+
+    def stepSimulation(self):
+        p.stepSimulation()
+
+if __name__ == "__main__":
+    r = PyBulletRobot(4, 4)
+    ls = np.array([[0,0],[0,0],[0,0],[0,0]], dtype=np.float32)
+    if True:
+        print("# ls=%s" % ls)
+        r.step(ls)
+        (p, v, u) = r.getHeadcamPVU()
+        print("p=%s v=%s u=%s" % (p, v, u))

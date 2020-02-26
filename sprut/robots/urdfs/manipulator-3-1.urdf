@@ -1,0 +1,250 @@
+
+<?xml version="1.0" ?>
+
+<robot name="Manipulator">
+
+  <!-- Colors -->
+  <material name="Black">
+    <color rgba="0 0 0 1.0"/>
+  </material>
+  <material name="Grey">
+    <color rgba="0.2 0.2 0.2 1.0"/>
+  </material>
+  <material name="Orange">
+    <color rgba="1.0 0.423529411765 0.0392156862745 1.0"/>
+  </material>
+  <material name="Blue">
+  <color rgba="0.0 0.0 1 1.0"/>      
+  </material>
+  <material name="Red">
+    <color rgba="1 0 0 1.0"/>      
+  </material>
+
+  <!-- Base Link -->
+  <link name="SprutBase">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="100"/>
+      <inertia ixx="9.3" ixy="0" ixz="0" iyy="9.3" iyz="0" izz="9.3"/>
+    </inertial>
+    <!-- visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="1 1 0" />
+      </geometry>
+      <material name="Black"/>
+    </visual -->
+  </link>
+
+  <!-- Section 0 -->
+
+  <joint name="Joint_0a" type="revolute">
+    <parent link="SprutBase"/>
+    <child link="Block0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="Block0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.023 0.023 0.005"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <joint name="Joint_0b" type="revolute">
+    <parent link="Block0"/>
+    <child link="PlateFixLink0"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint0b" type="fixed">
+    <parent link="PlateFixLink0"/>
+    <child link="Plate0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="Plate0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.035000" length="0.025"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <!-- Section 1 -->
+
+  <joint name="Joint_1a" type="revolute">
+    <parent link="Plate0"/>
+    <child link="Block1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="Block1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.023 0.023 0.005"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <joint name="Joint_1b" type="revolute">
+    <parent link="Block1"/>
+    <child link="PlateFixLink1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint1b" type="fixed">
+    <parent link="PlateFixLink1"/>
+    <child link="Plate1"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="Plate1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.035000" length="0.025"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <!-- Section 2 -->
+
+  <joint name="Joint_2a" type="revolute">
+    <parent link="Plate1"/>
+    <child link="Block2"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="Block2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.023 0.023 0.005"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <joint name="Joint_2b" type="revolute">
+    <parent link="Block2"/>
+    <child link="PlateFixLink2"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint2b" type="fixed">
+    <parent link="PlateFixLink2"/>
+    <child link="Plate2"/>
+    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <axis xyz="-1 0 0"/>
+  </joint>
+
+  <link name="Plate2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.035000" length="0.025"/>
+      </geometry>
+      <material name="Grey"/>
+    </visual>
+  </link>
+
+  <joint name="Joint_Camera" type="fixed">
+    <parent link="Plate2"/>
+    <child link="CameraBox"/>
+    <origin rpy="0 0 0" xyz="0 0 0.000000"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="CameraBox">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.005000"/>
+      </geometry>
+      <material name="Black"/>
+    </visual>
+  </link>
+
+</robot>

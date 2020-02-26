@@ -63,10 +63,25 @@
 
   <joint name="Joint_0b" type="revolute">
     <parent link="Block0"/>
+    <child link="PlateFixLink0"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink0">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint0b" type="fixed">
+    <parent link="PlateFixLink0"/>
     <child link="Plate0"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate0">
@@ -111,10 +126,25 @@
 
   <joint name="Joint_1b" type="revolute">
     <parent link="Block1"/>
+    <child link="PlateFixLink1"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint1b" type="fixed">
+    <parent link="PlateFixLink1"/>
     <child link="Plate1"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate1">
@@ -159,10 +189,25 @@
 
   <joint name="Joint_2b" type="revolute">
     <parent link="Block2"/>
+    <child link="PlateFixLink2"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint2b" type="fixed">
+    <parent link="PlateFixLink2"/>
     <child link="Plate2"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate2">
@@ -207,10 +252,25 @@
 
   <joint name="Joint_3b" type="revolute">
     <parent link="Block3"/>
+    <child link="PlateFixLink3"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink3">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint3b" type="fixed">
+    <parent link="PlateFixLink3"/>
     <child link="Plate3"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate3">
@@ -255,10 +315,25 @@
 
   <joint name="Joint_4b" type="revolute">
     <parent link="Block4"/>
+    <child link="PlateFixLink4"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink4">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint4b" type="fixed">
+    <parent link="PlateFixLink4"/>
     <child link="Plate4"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate4">
@@ -303,10 +378,25 @@
 
   <joint name="Joint_5b" type="revolute">
     <parent link="Block5"/>
+    <child link="PlateFixLink5"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink5">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint5b" type="fixed">
+    <parent link="PlateFixLink5"/>
     <child link="Plate5"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate5">
@@ -351,10 +441,25 @@
 
   <joint name="Joint_6b" type="revolute">
     <parent link="Block6"/>
+    <child link="PlateFixLink6"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink6">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint6b" type="fixed">
+    <parent link="PlateFixLink6"/>
     <child link="Plate6"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate6">
@@ -399,10 +504,25 @@
 
   <joint name="Joint_7b" type="revolute">
     <parent link="Block7"/>
+    <child link="PlateFixLink7"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink7">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint7b" type="fixed">
+    <parent link="PlateFixLink7"/>
     <child link="Plate7"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate7">
@@ -447,10 +567,25 @@
 
   <joint name="Joint_8b" type="revolute">
     <parent link="Block8"/>
+    <child link="PlateFixLink8"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink8">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint8b" type="fixed">
+    <parent link="PlateFixLink8"/>
     <child link="Plate8"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate8">
@@ -495,10 +630,25 @@
 
   <joint name="Joint_9b" type="revolute">
     <parent link="Block9"/>
+    <child link="PlateFixLink9"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink9">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint9b" type="fixed">
+    <parent link="PlateFixLink9"/>
     <child link="Plate9"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate9">
@@ -543,10 +693,25 @@
 
   <joint name="Joint_10b" type="revolute">
     <parent link="Block10"/>
+    <child link="PlateFixLink10"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink10">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint10b" type="fixed">
+    <parent link="PlateFixLink10"/>
     <child link="Plate10"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate10">
@@ -591,10 +756,25 @@
 
   <joint name="Joint_11b" type="revolute">
     <parent link="Block11"/>
+    <child link="PlateFixLink11"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink11">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint11b" type="fixed">
+    <parent link="PlateFixLink11"/>
     <child link="Plate11"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate11">
@@ -639,10 +819,25 @@
 
   <joint name="Joint_12b" type="revolute">
     <parent link="Block12"/>
+    <child link="PlateFixLink12"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink12">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint12b" type="fixed">
+    <parent link="PlateFixLink12"/>
     <child link="Plate12"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate12">
@@ -687,10 +882,25 @@
 
   <joint name="Joint_13b" type="revolute">
     <parent link="Block13"/>
+    <child link="PlateFixLink13"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink13">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint13b" type="fixed">
+    <parent link="PlateFixLink13"/>
     <child link="Plate13"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate13">
@@ -735,10 +945,25 @@
 
   <joint name="Joint_14b" type="revolute">
     <parent link="Block14"/>
+    <child link="PlateFixLink14"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink14">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint14b" type="fixed">
+    <parent link="PlateFixLink14"/>
     <child link="Plate14"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate14">
@@ -783,10 +1008,25 @@
 
   <joint name="Joint_15b" type="revolute">
     <parent link="Block15"/>
+    <child link="PlateFixLink15"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink15">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint15b" type="fixed">
+    <parent link="PlateFixLink15"/>
     <child link="Plate15"/>
     <origin rpy="0 0 0" xyz="0 0 0.028000"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate15">
@@ -807,7 +1047,7 @@
   <joint name="Joint_Camera" type="fixed">
     <parent link="Plate15"/>
     <child link="CameraBox"/>
-    <origin rpy="0 0 0" xyz="0 0 0.035000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.000000"/>
     <axis xyz="0 0 1"/>
   </joint>
 
@@ -820,7 +1060,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <sphere radius="0.035000"/>
+        <sphere radius="0.005000"/>
       </geometry>
       <material name="Black"/>
     </visual>

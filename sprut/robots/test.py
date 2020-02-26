@@ -3,14 +3,20 @@
 import pybullet as p
 import numpy as np
 
-from sprut_robot import Robot, NJ
+from pybullet_robot import PyBulletRobot, W, H
+
+import cv2
+
+from camorn import set_headcam_params, get_horizon_bank
 
 if __name__ == "__main__":
     #LOGFILE = "log10s.txt"
     #logf = open(LOGFILE, "w")
 
     gui = True
-    r = Robot(render=gui)
+    r = PyBulletRobot(4, 4, render=gui)
+
+    set_headcam_params(W, H)
 
     # Target and manipulator are both NNE
     r.setTarget([1.5, 1.5, 1])
@@ -19,14 +25,15 @@ if __name__ == "__main__":
         s_t_phi = p.addUserDebugParameter("t_phi", -1.5, 1.5, 0)
 
         phiSliders = []
-        for i in range(NJ * 2):
-            title = "%d:%d" % (i / 2, i % 2)
+        for i in range(r.NS):    
+          for j in [0, 1]:
+            title = "%d:%d" % (i, j)
             s = p.addUserDebugParameter(title, -1.5, 1.5, 0)
-            phiSliders.append(s)
+            phiSliders.append((i, j,s))
     else:
-        phis = []
-        for i in range(NJ * 2):
-            phis.append(0)
+        phis = np.zeros((r.NS, 2), dtype=np.float32)
+        #for i in range(NJ * 2):
+        #phis.append(0)
 
     old_t_phi = None
     old_phis = None
@@ -46,10 +53,10 @@ if __name__ == "__main__":
 
                 do_step = True
 
-            phis = []
-            for s in phiSliders:
+            phis = np.zeros((r.NS, 2), dtype=np.float32)
+            for (i, j, s) in phiSliders:
                 phi = p.readUserDebugParameter(s)
-                phis.append(phi)
+                phis[i, j] = phi
 
             #print("%s <=> %s" % (old_phis, phis))
             if old_phis is None or not np.array_equal(phis, old_phis):
@@ -68,7 +75,9 @@ if __name__ == "__main__":
         #cam_p, cam_v, _cap_u = r.getCamPVU()
         #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
 
-        r.getCameraImage()
+        img = r.getCameraImage()
+        print("horizon_bank=%s" % get_horizon_bank(img))
+
         #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
 
         #print("%f %f" % (t, reward), file=logf)

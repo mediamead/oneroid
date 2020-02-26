@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sprut_robot
+import pybullet_robot
 
 class URDFPrinter():
   header = """
@@ -70,10 +70,25 @@ class URDFPrinter():
 
   <joint name="Joint_%(index)db" type="revolute">
     <parent link="Block%(index)d"/>
+    <child link="PlateFixLink%(index)d"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <axis xyz="-1 0 0"/>
+    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
+  </joint>
+
+  <link name="PlateFixLink%(index)d">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="PlateFixJoint%(index)db" type="fixed">
+    <parent link="PlateFixLink%(index)d"/>
     <child link="Plate%(index)d"/>
     <origin rpy="0 0 0" xyz="0 0 %(joint_z)f"/>
     <axis xyz="-1 0 0"/>
-    <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
 
   <link name="Plate%(index)d">
@@ -136,9 +151,9 @@ class URDFPrinter():
 
   base_name = "SprutBase"
 
-  def print_manipulator(self, f):
+  def print_manipulator(self, f, NS, NP):
     self.print_header(f, "Manipulator")
-    last_plate = self.print_manipulator_body(f)
+    last_plate = self.print_manipulator_body(f, NS, NP)
     self.print_manipulator_camera(f, last_plate)
     self.print_footer(f)
 
@@ -158,7 +173,7 @@ class URDFPrinter():
   def print_footer(self, f):
     print(self.footer,file = f)
 
-  def print_manipulator_body(self, f):
+  def print_manipulator_body(self, f, NS, NP):
     """
     Prints all segments of the manipulator's body
     Returns the name of the very last link (to mount the camera on)
@@ -166,7 +181,7 @@ class URDFPrinter():
     print(self.manipulator_base_template % {"base_name": self.base_name}, file=f)
 
     JD = 0.028 # 4mm plate + 24mm to the axis
-    NJ = sprut_robot.NJ * sprut_robot.NP
+    NJ = NS * NP
     for i in range(NJ):
       if i > 0:
         parent = "Plate%d" % (i-1)
@@ -190,8 +205,8 @@ class URDFPrinter():
   def print_manipulator_camera(self, f, parent_link):
     print(self.manipulator_camera_template % {
       "parent_link": parent_link,
-      "size": 0.035,
-      "camera_z": 0.035,
+      "size": 0.005,
+      "camera_z": 0, #0.035,
       "color": "Black"
       }, file=f)
 
@@ -199,9 +214,11 @@ class URDFPrinter():
     print("<!-- fixme cage -->", file=f)
 
   def print_target_body(self, f):
-    print(self.target_template % {"xyz": "1 1 1", "r": 0.25}, file=f)
+    print(self.target_template % {"xyz": "1 1 1", "r": 0.05}, file=f)
 
 p = URDFPrinter()
-p.print_manipulator(open("manipulator.urdf", "w"))
-p.print_target(open("target.urdf", "w"))
-p.print_cage(open("cage.urdf", "w"))
+for NS in [1, 2, 3, 4, 8]:
+ for NP in [1, 2, 3, 4]:
+  p.print_manipulator(open("urdfs/manipulator-%d-%d.urdf" % (NS, NP), "w"), NS, NP)
+p.print_target(open("urdfs/target.urdf", "w"))
+p.print_cage(open("urdfs/cage.urdf", "w"))
