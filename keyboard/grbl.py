@@ -68,7 +68,7 @@ class Grbl(object):
 
         self.s = aioserial.AioSerial(port=port, baudrate=speed)
 
-        print("# Flushing %s ..." % port)
+        print("# + Flushing %s ..." % port)
         self.s.timeout = 1
         for _ in range(5):
             line = asyncio.run(self.s.readline_async())
