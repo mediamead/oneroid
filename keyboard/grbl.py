@@ -16,6 +16,7 @@
 
 import time
 import serial
+import aioserial, asyncio
 
 def find_ports(SER1="858303033393515190B0", SER2="5583834363335110D111"):
   while True:
@@ -67,6 +68,15 @@ class Grbl(object):
 
         self.s = aioserial.AioSerial(port=port, baudrate=speed)
 
+        print("# Flushing %s ..." % port)
+        self.s.timeout = 1
+        for _ in range(5):
+            line = asyncio.run(self.s.readline_async())
+            line = line.decode(errors='ignore').strip()
+            print("# Got: %s" % line)
+        self.s.timeout = None
+        print("# Flushing done")
+
         # Go through homing
         if homing:
             self.send("$H")
@@ -75,24 +85,26 @@ class Grbl(object):
 
     def send(self, cmd):
         asyncio.run(asyncio.wait([
-            self.grbls[grbl_n].async_send(cmd),
-            self.grbls[grbl_n].async_wok()
+            self.async_send(cmd),
+            self.async_wok()
         ]))
     
     async def async_send(self, cmd):
+        cmd = (cmd + "\n").encode()
         if self.dry_run:
             print("#DRY send port=%s, cmd=%s" % (self.port, cmd))
             return
 
-        nwritten: int = await aioserial_instance.write_async(cmd)
+        nwritten: int = await self.s.write_async(cmd)
         print("#Grbl.async_send(port=%s, cmd=%s, nwritten=%d)" % (self.port, cmd, nwritten))
 
     async def async_wok(self):
-        line: bytes = await aioserial_instance.readline_async()
-        ok = line.decode(errors='ignore').strip()
-        print("#Grbl.async_wok(port=%s, ok=%s" % (self.port, ok))
-        if ok != "ok":
-            print("# ERROR: got %s instead of 'ok' on port %s" % (ok, self.port))
+        while True:
+            line = await self.s.readline_async()
+            line = line.decode(errors='ignore').strip()
+            print("#Grbl.async_wok(port=%s, line=%s" % (self.port, line))
+            if line == "ok":
+                return
 
 import re, time
 from serial.tools.list_ports import comports
