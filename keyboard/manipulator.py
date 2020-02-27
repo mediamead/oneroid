@@ -3,6 +3,7 @@
 N_AXIS = 8
 
 import time
+import asyncio
 from grbl import Grbl, find_ports
 
 class Manipulator(object):
@@ -56,10 +57,14 @@ class Manipulator(object):
             grbl_n, gcode = self.gam.get_gcode(i, pos[i])
             grbl_cmds[grbl_n].append(gcode)
         
-        # send built commands
+        # send the commands
+        asyncs = []
         for grbl_n in range(len(grbl_cmds)):
             cmd = " ".join(grbl_cmds[grbl_n])
-            self.grbls[grbl_n].send(cmd)
+            asyncs.append(self.grbls[grbl_n].async_send(cmd))
+            asyncs.append(self.grbls[grbl_n].async_wok())
+        
+        asyncio.run(asyncio.wait(asyncs))
         
         self.poss = pos
     

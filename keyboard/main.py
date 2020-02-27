@@ -9,6 +9,8 @@ print("qa/ws/ed/rf/tg/yh/uj/ik - движение точки")
 print("n - перейти к следующему сценарию")
 print("V - сохранить сценарий")
 print("L - перезагрузить сценарий")
+# print("m - измерить время исполнения и подогнать задержки")
+print("x - прогнать все точки")
 print("? - показать точки текущего сценария")
 
 def handle_keyboard(ch):
@@ -23,6 +25,10 @@ def handle_keyboard(ch):
         return ('write-scenario', None)
     elif ch == 'L':
         return ('reload-scenario', None)
+    # elif ch == 'm':
+    #     return ('measure-scenario', None)
+    elif ch == 'x':
+        return ('execute-scenario', None)
 
     if ch.isupper():
         step = 10
@@ -88,6 +94,15 @@ def handle_keyboard(ch):
     # fall-through from axis movement commands
     return ('move', [axis, delta])
 
+# def measure(scenario, m):
+#     m.move(scenario.get_first_pos())
+#     for pos in scenario.positions[1:]:
+#         pos.timing1 = m.measure1(pos.pos)
+#     m.move(scenario.get_first_pos())
+#     for pos in scenario.positions[1:]:
+#         pos.timing2 = m.measure2(pos.pos)
+#     m.move(scenario.get_first_pos())
+
 kb = KBHit()
 
 m = Manipulator(homing=False, dry_run=False)
@@ -123,6 +138,11 @@ while True:
         m.move(pos.pos)
     elif cmd == 'write-scenario':
         scenario.save()
+    # elif cmd == 'measure-scenario':
+    #     measure(scenario)
+    elif cmd == 'execute-scenario':
+        for pos in scenario.positions:
+            m.move(pos.pos)
     elif cmd == 'reload-scenario':
         scenario.load()
         scenario.print()
