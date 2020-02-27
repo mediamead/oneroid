@@ -9,8 +9,7 @@ from pybullet_robot import PyBulletRobot
 from tensor_robot import TensorRobot
 from hybrid_robot import HybridRobot
 
-if __name__ == "__main__":
-
+def sweep(N=3):
     r = HybridRobot(4, 4)
 
     #ls = np.array([[0,np.pi/8], [0,np.pi/4]], dtype=np.float32)
@@ -21,7 +20,7 @@ if __name__ == "__main__":
     #r.step(phis)
 
     line_xpos = 1. # X axis pos of green line
-    line_zpos = 0.7 # Z axis pos of green line
+    line_zpos = 0.75 # Z axis pos of green line
     line_ypos = 1.5 # extent of the line along Y axis
 
     p_head = np.array([0.2, 0., line_zpos]) # desired position of the head
@@ -31,14 +30,33 @@ if __name__ == "__main__":
     r.pr.addHeadposMarker(p_head)
     r.pr.addGreenLine(line_xpos, line_ypos, line_zpos)
 
-    while True:
-        print("-" * 40)
-        p_target = np.array([line_xpos, line_ypos - 2*line_ypos*np.random.rand(), line_zpos])
-        z_head = p_target - p_head
-        r.pr.setTarget(p_target)
+    T1 = np.array([line_xpos, 0, line_zpos])
+    T2 = np.array([line_xpos, line_ypos, line_zpos])
 
-        for _ in range(25):
-            r.tr.model.homing_pxyz(p_head, x_head, y_head, z_head)
+    warming_up = True
+
+    zs = []
+    phiss = []
+    costs = []
+
+    for i in range(N):
+        T = T1 + (T2 - T1) * i / N
+        print("# ----- %d/%d %s" % (i, N, T))
+
+        z_head = T - p_head
+        z_head /= np.linalg.norm(z_head)
+        r.pr.setTarget(T)
+
+        if warming_up:
+            print("# warming up")
+            for _ in range(25):
+                cost = r.tr.model.homing_pxyz(p_head, x_head, y_head, z_head)
+                print("#c=%s" % (cost))
+            warming_up = False
+            print("# warmed up")
+
+        for _ in range(10):
+            cost = r.tr.model.homing_pxyz(p_head, x_head, y_head, z_head)
             phis = r.tr.model.get_phis()
 
             #print("pxyz, phis (got from homing)=%s" % pxyz, phis)
@@ -47,4 +65,21 @@ if __name__ == "__main__":
 
             r.pr.step(phis)
             r.pr.getCameraImage()
-            r.check()
+            #r.check()
+
+            #print("#c=%s" % (cost))
+
+            if cost[0] <= 1e-3:
+                break
+
+
+        print("z_head=%s phis=%s c=%s" % (z_head, phis.flatten(), cost))
+
+        zs.append(z_head)
+        phiss.append(phiss)
+        costs.append(costs)
+
+    return zs,phiss,costs
+
+if __name__ == "__main__":
+    sweep(N)
