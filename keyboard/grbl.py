@@ -106,6 +106,31 @@ class Grbl(object):
             if line == "ok":
                 return
 
+    async def async_move(self, cmd):
+        assert(not self.dry_run)
+
+        cmd = (cmd + "\n").encode()
+        nwritten: int = await self.s.write_async(cmd)
+        print("#Grbl.async_move(port=%s, sent=%s, nwritten=%d)" % (self.port, cmd, nwritten))
+
+        while True:
+            line = await self.s.readline_async()
+            line = line.decode(errors='ignore').strip()
+            print("#Grbl.async_move(port=%s, read=%s" % (self.port, line))
+            if line == "ok":
+                break
+
+        while True:
+            cmd = ("$?\n").encode()
+            nwritten: int = await self.s.write_async(cmd)
+            print("#Grbl.async_move(port=%s, sent=%s, nwritten=%d)" % (self.port, cmd, nwritten))
+
+            line = await self.s.readline_async()
+            line = line.decode(errors='ignore').strip()
+            print("#Grbl.async_move(port=%s, read=%s" % (self.port, line))
+            if line.startswith("<Idle|"):
+                break
+
 import re, time
 from serial.tools.list_ports import comports
 

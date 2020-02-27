@@ -61,8 +61,7 @@ class Manipulator(object):
         asyncs = []
         for grbl_n in range(len(grbl_cmds)):
             cmd = " ".join(grbl_cmds[grbl_n])
-            asyncs.append(self.grbls[grbl_n].async_send(cmd))
-            asyncs.append(self.grbls[grbl_n].async_wok())
+            asyncs.append(self.grbls[grbl_n].async_move(cmd))
         
         asyncio.run(asyncio.wait(asyncs))
         
