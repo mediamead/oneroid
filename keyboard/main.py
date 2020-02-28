@@ -29,6 +29,8 @@ def handle_keyboard(ch):
     #     return ('measure-scenario', None)
     elif ch == 'x':
         return ('execute-scenario', None)
+    elif ch == ' ':
+        return ('grbl-status', None)
 
     if ch.isupper():
         step = 10
@@ -148,3 +150,5 @@ while True:
         scenario.print()
         pos = scenario.get_first_pos()
         m.move(pos.pos)
+    elif cmd == 'grbl-status':
+        m.grbl_status()

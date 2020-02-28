@@ -59,9 +59,10 @@ class Manipulator(object):
         
         # send the commands
         asyncs = []
-        for grbl_n in range(len(grbl_cmds)):
+        for grbl_n in range(len(self.grbls)):
             cmd = " ".join(grbl_cmds[grbl_n])
-            asyncs.append(self.grbls[grbl_n].async_move(cmd))
+            self.grbls[grbl_n].send(cmd, debug=True)
+            asyncs.append(self.grbls[grbl_n].async_wait_idle())
         
         asyncio.run(asyncio.wait(asyncs))
         
@@ -69,6 +70,11 @@ class Manipulator(object):
     
     def get_pos(self):
         return self.poss
+
+    def grbl_status(self):
+        for grbl_n in range(len(self.grbls)):
+            self.grbls[grbl_n].send("?\n", debug=True)
+            self.grbls[grbl_n].flush()
 
 if __name__ == "__main__":
     m = Manipulator(homing=True, dry_run=False)

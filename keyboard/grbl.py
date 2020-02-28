@@ -67,8 +67,15 @@ class Grbl(object):
             return
 
         self.s = aioserial.AioSerial(port=port, baudrate=speed)
+        self.flush()
+        # Go through homing or unlock
+        if homing:
+            self.send("$H")
+        else:
+            self.send("$X")
 
-        print("# + Flushing %s ..." % port)
+    def flush(self):
+        print("# + Flushing %s ..." % self.port)
         self.s.timeout = 1
         for _ in range(5):
             line = asyncio.run(self.s.readline_async())
@@ -77,59 +84,49 @@ class Grbl(object):
         self.s.timeout = None
         print("# Flushing done")
 
-        # Go through homing
-        if homing:
-            self.send("$H")
-        else:
-            self.send("$X")
-
-    def send(self, cmd):
+    def send(self, cmd, debug=False):
         asyncio.run(asyncio.wait([
-            self.async_send(cmd),
-            self.async_wok()
+            self.async_send(cmd, debug),
+            self.async_wok(debug)
         ]))
     
-    async def async_send(self, cmd):
+    async def async_send(self, cmd, debug=False):
         cmd = (cmd + "\n").encode()
         if self.dry_run:
             print("#DRY send port=%s, cmd=%s" % (self.port, cmd))
             return
 
         nwritten: int = await self.s.write_async(cmd)
-        print("#Grbl.async_send(port=%s, cmd=%s, nwritten=%d)" % (self.port, cmd, nwritten))
+        if debug:
+            print("#Grbl.async_send(port=%s, cmd=%s, nwritten=%d)" % (self.port, cmd, nwritten))
 
-    async def async_wok(self):
-        while True:
-            line = await self.s.readline_async()
-            line = line.decode(errors='ignore').strip()
-            print("#Grbl.async_wok(port=%s, line=%s" % (self.port, line))
-            if line == "ok":
-                return
-
-    async def async_move(self, cmd):
+    async def async_wok(self, debug=False):
         assert(not self.dry_run)
 
-        cmd = (cmd + "\n").encode()
-        nwritten: int = await self.s.write_async(cmd)
-        print("#Grbl.async_move(port=%s, sent=%s, nwritten=%d)" % (self.port, cmd, nwritten))
-
         while True:
             line = await self.s.readline_async()
             line = line.decode(errors='ignore').strip()
-            print("#Grbl.async_move(port=%s, read=%s" % (self.port, line))
+            if debug:
+                print("#Grbl.async_wok(port=%s, line=%s" % (self.port, line))
             if line == "ok":
-                break
+                return
+            #if line.startswith("error:"):
+            #    return
+
+    async def async_wait_idle(self):
+        assert(not self.dry_run)
 
         while True:
-            cmd = ("$?\n").encode()
+            cmd = ("?").encode()
             nwritten: int = await self.s.write_async(cmd)
-            print("#Grbl.async_move(port=%s, sent=%s, nwritten=%d)" % (self.port, cmd, nwritten))
+            #print("#Grbl.async_wait_idle(port=%s, sent=%s, nwritten=%d)" % (self.port, cmd, nwritten))
 
             line = await self.s.readline_async()
             line = line.decode(errors='ignore').strip()
-            print("#Grbl.async_move(port=%s, read=%s" % (self.port, line))
+            #print("#Grbl.async_wait_idle(port=%s, read=%s" % (self.port, line))
             if line.startswith("<Idle|"):
                 break
+            time.sleep(0.1)
 
 import re, time
 from serial.tools.list_ports import comports
