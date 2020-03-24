@@ -12,7 +12,7 @@ if __name__ == '__main__':
     env = SubprocVecEnv([lambda: gym.make('eye_on_stick:EyeOnStick-v0') for i in range(n_cpu)])
 
     model = PPO2(MlpLnLstmPolicy, env, nminibatches=16, verbose=1, tensorboard_log="./tensorboard/")
-    model.learn(total_timesteps=10000)
+    model.learn(total_timesteps=25000)
 
     while True:
         obs = env.env_method('reset') #keep_phi=True)
