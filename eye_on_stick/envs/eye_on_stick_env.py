@@ -12,7 +12,7 @@ DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
 MIN_T_PHI = MIN_PHI # -np.pi/2  # min/max target angle
 MAX_T_PHI = MAX_PHI # np.pi/2
 TR = (2 + NJ) * S_LEN # distance to the target
-ALPHA_DONE = np.pi / 180 * 3  # done when within +/- 2 degrees to the target
+ALPHA_DONE = np.pi / 180 * 10  # done when within +/- 2 degrees to the target
 
 class EyeOnStickEnv(gym.Env):
   metadata = {'render.modes': ['human']}
@@ -50,13 +50,18 @@ class EyeOnStickEnv(gym.Env):
     if (not "phi" in self.state) or not keep_phi:
       self.state["phi"] = np.zeros(NJ) # self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
 
+    self.screw = self.np_random.uniform(size=(NJ,)) - 0.5
+
     #print("---")
     #print("t_phi: %.2f" % t_phi)
     #print("Initial phi[]: %s" % self.state["phi"])
 
-    #self.nstep = 0
+    self.nstep = 0
     self.calc_state()
     return self._get_obs()
+
+  def get_screw(self):
+    return self.screw
 
   def _get_obs(self):
     phi = self.state["phi"]
@@ -78,7 +83,7 @@ class EyeOnStickEnv(gym.Env):
       if phi[i] < MIN_PHI: phi[i] = MIN_PHI
       elif phi[i] > MAX_PHI: phi[i] = MAX_PHI
 
-    #self.nstep += 1
+    self.nstep += 1
 
     alpha0 = self.state["alpha"]
     self.calc_state()
@@ -94,13 +99,13 @@ class EyeOnStickEnv(gym.Env):
       else:
         reward = 0
 
-    #done = self.nstep > 50
+    done = self.nstep > 100
 
     return self._get_obs(), reward, done, {}
 
   # calculate endpoint position and target view angle from the current robot pose (phis)
   def calc_state(self):
-    phi = self.state["phi"]
+    phi = self.state["phi"] * self.screw
     x = self.state["_x"] = np.zeros(NJ,)
     y = self.state["_y"] = np.zeros(NJ,)
 
