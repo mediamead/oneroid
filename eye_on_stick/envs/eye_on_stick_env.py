@@ -50,7 +50,7 @@ class EyeOnStickEnv(gym.Env):
     if (not "phi" in self.state) or not keep_phi:
       self.state["phi"] = np.zeros(NJ) # self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
 
-    self.screw = self.np_random.uniform(size=(NJ,)) - 0.5
+    self.screw = 0.75 + self.np_random.uniform(size=(NJ,)) * 0.25
 
     #print("---")
     #print("t_phi: %.2f" % t_phi)
