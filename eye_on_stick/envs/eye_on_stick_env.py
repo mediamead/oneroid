@@ -11,7 +11,7 @@ MAX_PHI = np.pi/3
 DPHI = np.pi /180 /2 # joint rotation angle delta per step: half degree
 MIN_T_PHI = MIN_PHI # -np.pi/2  # min/max target angle
 MAX_T_PHI = MAX_PHI # np.pi/2
-TR = (1 + NJ) * S_LEN # distance to the target
+TR = (2 + NJ) * S_LEN # distance to the target
 ALPHA_DONE = np.pi / 180 * 3  # done when within +/- 2 degrees to the target
 
 class EyeOnStickEnv(gym.Env):
@@ -28,7 +28,7 @@ class EyeOnStickEnv(gym.Env):
     # 1 x t_phi + 1x alpha + NJ x phi
     self.observation_space = spaces.Box(
       low=MIN_PHI, high=MAX_PHI,
-      shape=((2+NJ),),
+      shape=((NJ+1),),
       dtype=np.float32)
 
     self.seed()
@@ -48,34 +48,26 @@ class EyeOnStickEnv(gym.Env):
 
     # randomize joint angles, unless we have ones already and want to keep
     if (not "phi" in self.state) or not keep_phi:
-      self.state["phi"] = self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
+      self.state["phi"] = np.zeros(NJ) # self.np_random.uniform(low=MIN_PHI, high=MAX_PHI, size=(NJ,))
 
-    print("---")
-    print("t_phi: %.2f" % t_phi)
-    print("Initial phi[]: %s" % self.state["phi"])
+    #print("---")
+    #print("t_phi: %.2f" % t_phi)
+    #print("Initial phi[]: %s" % self.state["phi"])
 
+    #self.nstep = 0
     self.calc_state()
     return self._get_obs()
 
   def _get_obs(self):
-    t_phi = self.state["target"][1]
     phi = self.state["phi"]
     alpha = self.state["alpha"]
-    return [
-      t_phi,
-      #sin(t_phi), cos(t_phi),
-      phi[0],
-      #sin(phi[0]), cos(phi[0]),
-      phi[1],
-      #sin(phi[1]), cos(phi[1]),
-      phi[2],
-      #sin(phi[2]), cos(phi[2]),
-      alpha,
-      #sin(alpha), cos(alpha)
-    ] # FIXME
+    obs = list(phi)
+    obs.append(alpha)
+    return obs
 
   def step(self, action):
     phi = self.state["phi"]
+    done = False
 
     # update joint angles according to the effect of the action, accumulate costs
     for i in range(NJ):
@@ -86,16 +78,23 @@ class EyeOnStickEnv(gym.Env):
       if phi[i] < MIN_PHI: phi[i] = MIN_PHI
       elif phi[i] > MAX_PHI: phi[i] = MAX_PHI
 
+    #self.nstep += 1
+
     alpha0 = self.state["alpha"]
     self.calc_state()
     alpha = self.state["alpha"]
 
     d_alpha = np.abs(alpha0) - np.abs(alpha)
-    if d_alpha <=0:
-      reward = -10
+    if d_alpha <=0 :
+      reward = -10 # penalize moves in wrong direction
     else:
-      reward = d_alpha / DPHI * 10
-    done = (np.abs(alpha) < ALPHA_DONE)
+      if np.abs(alpha) < ALPHA_DONE:
+        reward = 10 # reward state aimed at target
+        done = True
+      else:
+        reward = 0
+
+    #done = self.nstep > 50
 
     return self._get_obs(), reward, done, {}
 
