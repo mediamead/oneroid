@@ -22,11 +22,19 @@ class TensorRobot:
       self.model.close()
       print("*** TensorRobot() closed")
 
+NS = 4
+
 if __name__ == "__main__":
-    r = TensorRobot(4, 4)
+    r = TensorRobot(NS, 4)
     ls = np.array([[0,0],[0,0],[0,0],[0,0]], dtype=np.float32)
     if True:
         r.step(ls)
         (p, v, u) = r.getHeadcamPVU()
         print("p=%s v=%s u=%s" % (p, v, u))
+
+    for _ in range(100):
+      phis = np.random.randn(NS, 2) - 0.5
+      verr = r.model.calc_verr(phis)
+      print("phis=%s verr=%s" % (phis, verr))
+
     r.close()

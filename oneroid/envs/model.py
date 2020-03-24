@@ -17,8 +17,8 @@ class TensorRobotModel(object):
 
     self.model['p_target'] = tf.Variable([[0.]]*3, trainable=False)
     
-    v_target = tf.nn.l2_normalize(self.model['p_target'] - self.model['p'])
-    self.model['t_aim'] = tf.reduce_sum(tf.multiply(self.model['z'], v_target))
+    v_target = tf.nn.l2_normalize(self.model['p_target'] - self.model['p']) # view vector from the endpoint to the target
+    self.model['v_err'] = tf.reduce_sum(tf.multiply(self.model['z'], v_target))
 
     self.sess = tf.compat.v1.Session()
     self.sess.run(tf.compat.v1.global_variables_initializer())
@@ -67,8 +67,16 @@ class TensorRobotModel(object):
   def set(self, phis):
     self.sess.run(self.model['phis'].assign(phis / self.NP))
 
+  def set_target(self, p_target):
+    self.sess.run(self.model['p_target'].assign(p_target))
+
   def get_pxyz(self):
     return self.sess.run([self.model['p'], self.model['x'], self.model['y'], self.model['z']])
+
+  def calc_verr(self, phis):
+    return self.sess.run([
+      self.model['phis'].assign(phis / self.NP),
+      self.model['v_err']])[1]
 
   def close(self):
       self.sess.close()
