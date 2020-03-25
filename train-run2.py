@@ -8,10 +8,10 @@ from stable_baselines import PPO2
 from stable_baselines.common.vec_env import SubprocVecEnv
 
 if __name__ == '__main__':
-    n_cpu = 1
+    n_cpu = 8
     env = SubprocVecEnv([lambda: gym.make('eye_on_stick:EyeOnStick-v0') for i in range(n_cpu)])
 
-    model = PPO2(MlpLnLstmPolicy, env, nminibatches=1, verbose=1, tensorboard_log="./tensorboard/")
+    model = PPO2(MlpLnLstmPolicy, env, nminibatches=n_cpu, verbose=1, tensorboard_log="./tensorboard/")
     model.learn(total_timesteps=100000)
 
     while True:
