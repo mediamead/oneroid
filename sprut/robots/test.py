@@ -22,8 +22,8 @@ if __name__ == "__main__":
     r.setTarget([1.5, 1.5, 1])
 
     if gui:
-        s_t_phix = p.addUserDebugParameter("t_phix", -1.5, 1.5, 0)
-        s_t_phiy = p.addUserDebugParameter("t_phiy", -1.5, 1.5, 0)
+        s_t_theta = p.addUserDebugParameter("t_theta", -np.pi/2, np.pi/2, 0)
+        s_t_phi = p.addUserDebugParameter("t_phi", -np.pi, np.pi, 0)
 
         phiSliders = []
         for i in range(r.NS):    
@@ -36,22 +36,22 @@ if __name__ == "__main__":
         #for i in range(NJ * 2):
         #phis.append(0)
 
-    old_t_phix, old_t_phiy = None, None
+    old_t_theta, old_t_phi = None, None
     old_phis = None
     while True:
         do_step = False
         
         if gui:
             TR = 3
-            t_phix = p.readUserDebugParameter(s_t_phix)
-            t_phiy = p.readUserDebugParameter(s_t_phiy)
-            if old_t_phix is None or t_phix != old_t_phix or t_phiy != old_t_phiy:
-                t_x = TR * np.sin(t_phix)
-                t_y = TR * np.sin(t_phiy)
-                t_z = TR# * np.cos(t_phi)
+            t_theta = p.readUserDebugParameter(s_t_theta)
+            t_phi = p.readUserDebugParameter(s_t_phi)
+            if old_t_theta is None or old_t_phi is None or t_phi != old_t_phi or t_theta != old_t_theta:
+                t_x = TR * np.sin(t_theta) * np.cos(t_phi)
+                t_y = TR * np.sin(t_theta) * np.sin(t_phi)
+                t_z = TR * np.cos(t_theta)
 
                 r.setTarget([t_x, t_y, t_z])
-                old_t_phix, old_t_phiy = t_phix, t_phiy
+                old_t_theta, old_t_phi = t_theta, t_phi
 
                 do_step = True
 
