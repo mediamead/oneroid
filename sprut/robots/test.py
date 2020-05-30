@@ -69,8 +69,10 @@ if __name__ == "__main__":
 
         r.step(phis)
         
-        imb = r.getImbalance()
-        print("imb %s" % imb)
+        #imb = r.getImbalance()
+        #print("imb %s" % imb)
+        offc = r.getOffCenter()
+        print("offc %s" % str(offc))
 
         #cam_p, cam_v, _cap_u = r.getCamPVU()
         #print("cam_p %s, cam_v %s" % (cam_p, cam_v))

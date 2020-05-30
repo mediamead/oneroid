@@ -31,7 +31,7 @@ class PyBulletRobot(object):
         if render:
             p.connect(p.GUI)
             p.configureDebugVisualizer(p.COV_ENABLE_GUI, 1)
-            p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 0)
+            p.configureDebugVisualizer(p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW, 1)
             p.configureDebugVisualizer(p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, 0)
             p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 1)
         else:
@@ -117,7 +117,7 @@ class PyBulletRobot(object):
 
         return cam_p, camera_vector, up_vector
 
-    def getCameraImage(self, pvu=None):
+    def getCameraImages(self, pvu=None):
         """
         Get image given Position, Vector, and Up
         """
@@ -134,33 +134,38 @@ class PyBulletRobot(object):
         imgs = p.getCameraImage(W, H, view_matrix, self.projection_matrix)
         assert((W, H) == (imgs[0], imgs[1]))
 
+        return imgs
+
+    def getCameraImage(self, pvu=None, segmask=False):
+        imgs = self.getCameraImages()
         rgba = np.reshape(imgs[2], (H, W, 4)).astype(np.uint8)
         img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
 
         return img
 
-    # def getOffCenter(self):
-    #     imgs = self.getCameraImage()
-    #     # get segmask
-    #     segmask = imgs[4]
-    #     segmask = np.reshape(segmask, (H, W))
-    #     # ---
-    #     # find center mass and mass of the target
-    #     x = y = m = 0
-    #     for i in range(H):
-    #         for j in range(W):
-    #             if segmask[i][j] == self.targetId:
-    #                 x += j
-    #                 y += i
-    #                 m += 1
-    #     if m > 0:
-    #         # map to (-1, 1) range
-    #         dx = 1. - 2.*x/m/W
-    #         dy = 1. - 2.*y/m/H
-    #         #dr = np.sqrt(dx**2 + dy**2)
-    #         return (dx, dy)
-    #     else:
-    #         return None
+    def getOffCenter(self):
+        segmask = self.getCameraImages()[4]
+        # get segmask
+        #segmask = imgs[4]
+        #print(imgs.shape)
+        segmask = np.reshape(segmask, (H, W))
+        # ---
+        # find center mass and mass of the target
+        x = y = m = 0
+        for i in range(H):
+            for j in range(W):
+                if segmask[i][j] == self.targetId:
+                    x += j
+                    y += i
+                    m += 1
+        if m > 0:
+            # map to (-1, 1) range
+            dx = 1. - 2.*x/m/W
+            dy = 1. - 2.*y/m/H
+            #dr = np.sqrt(dx**2 + dy**2)
+            return (dx, dy)
+        else:
+            return None
 
     def getImbalance(self):
         R = np.zeros(2)
