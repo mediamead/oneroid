@@ -45,7 +45,7 @@ class PyBulletRobot(object):
         self._loadBody("urdfs/plane.urdf", [0, 0, 0], [0, 0, 0])
         #self._loadBody("urdfs/plane.urdf", [0, 0, 3], [0, np.pi, 0])
 
-        self._loadBody("urdfs/green-line.urdf", [0, 0, 2], [np.pi/2, 0, np.pi/2])
+        #self._loadBody("urdfs/green-line.urdf", [0, 0, 2], [np.pi/2, 0, np.pi/2])
 
         self.bodyId = self._loadBody("urdfs/manipulator-%d-%d.urdf" % (self.NS, self.NP))
         assert(p.getNumJoints(self.bodyId) == self.NS * self.NP * 3 + 1)
