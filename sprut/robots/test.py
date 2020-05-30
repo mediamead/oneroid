@@ -22,7 +22,8 @@ if __name__ == "__main__":
     r.setTarget([1.5, 1.5, 1])
 
     if gui:
-        s_t_phi = p.addUserDebugParameter("t_phi", -1.5, 1.5, 0)
+        s_t_phix = p.addUserDebugParameter("t_phix", -1.5, 1.5, 0)
+        s_t_phiy = p.addUserDebugParameter("t_phiy", -1.5, 1.5, 0)
 
         phiSliders = []
         for i in range(r.NS):    
@@ -35,21 +36,22 @@ if __name__ == "__main__":
         #for i in range(NJ * 2):
         #phis.append(0)
 
-    old_t_phi = None
+    old_t_phix, old_t_phiy = None, None
     old_phis = None
     while True:
         do_step = False
         
         if gui:
             TR = 3
-            t_phi = p.readUserDebugParameter(s_t_phi)
-            if old_t_phi is None or t_phi != old_t_phi:
-                t_x = TR * np.sin(t_phi)
-                t_y = 0
-                t_z = TR * np.cos(t_phi)
+            t_phix = p.readUserDebugParameter(s_t_phix)
+            t_phiy = p.readUserDebugParameter(s_t_phiy)
+            if old_t_phix is None or t_phix != old_t_phix or t_phiy != old_t_phiy:
+                t_x = TR * np.sin(t_phix)
+                t_y = TR * np.sin(t_phiy)
+                t_z = TR# * np.cos(t_phi)
 
                 r.setTarget([t_x, t_y, t_z])
-                old_t_phi = t_phi
+                old_t_phix, old_t_phiy = t_phix, t_phiy
 
                 do_step = True
 
