@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #LOGFILE = "log10s.txt"
     #logf = open(LOGFILE, "w")
 
-    gui = True
+    gui = False
     r = PyBulletRobot(4, 4, render=gui)
 
     #set_headcam_params(W, H)
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     good_phiss = []
     nbatch = 0
-    BATCHSIZE = 10000
+    BATCHSIZE = 1000
 
     while True:
         do_step = False
