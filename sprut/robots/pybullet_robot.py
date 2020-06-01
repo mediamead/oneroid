@@ -104,15 +104,19 @@ class PyBulletRobot(object):
 # --------------------------------------------------------------------
 
     def euler2orn(self, alpha, beta, gamma):
-        return p.getQuaternionFromEuler(alpha, beta, gamma)
+        return list(p.getQuaternionFromEuler([alpha, beta, gamma]))
 
     def getHeadcamPO(self):
         # Center of mass position and orientation of the camera box
         cam_p, cam_o, _, _, _, _ = p.getLinkState(self.bodyId, self.cameraLinkId)
-        return cam_p, cam_o
+        return list(cam_p), list(cam_o)
     
     def getHeadcamPVU(self):
         cam_p, cam_o = self.getHeadcamPO()
+        cam_v, cam_u = self.orn2vu(cam_o)
+        return cam_p, cam_v, cam_u
+
+    def orn2vu(sel, cam_o):
         rot_matrix = p.getMatrixFromQuaternion(cam_o)
         rot_matrix = np.array(rot_matrix).reshape(3, 3)
 
@@ -124,7 +128,7 @@ class PyBulletRobot(object):
         camera_vector = rot_matrix.dot(init_camera_vector)
         up_vector = rot_matrix.dot(init_up_vector)
 
-        return cam_p, camera_vector, up_vector
+        return camera_vector, up_vector
 
     def getCameraImages(self, pvu=None):
         """
