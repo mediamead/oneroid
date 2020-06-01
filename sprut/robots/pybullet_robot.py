@@ -103,14 +103,23 @@ class PyBulletRobot(object):
 
 # --------------------------------------------------------------------
 
-    def getHeadcamPVU(self):
+    def euler2orn(self, alpha, beta, gamma):
+        return p.getQuaternionFromEuler(alpha, beta, gamma)
+
+    def getHeadcamPO(self):
         # Center of mass position and orientation of the camera box
         cam_p, cam_o, _, _, _, _ = p.getLinkState(self.bodyId, self.cameraLinkId)
+        return cam_p, cam_o
+    
+    def getHeadcamPVU(self):
+        cam_p, cam_o = self.getHeadcamPO()
         rot_matrix = p.getMatrixFromQuaternion(cam_o)
         rot_matrix = np.array(rot_matrix).reshape(3, 3)
+
         # Initial vectors
         init_camera_vector = (0, 0, 1)  # z-axis
         init_up_vector = (-1, 0, 0)  # x-axis
+
         # Rotated vectors
         camera_vector = rot_matrix.dot(init_camera_vector)
         up_vector = rot_matrix.dot(init_up_vector)
