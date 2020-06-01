@@ -5,41 +5,43 @@ import numpy as np
 
 from pybullet_robot import PyBulletRobot, W, H
 
-import cv2
+import tensorflow as tf
 
-#from camorn import set_headcam_params, get_horizon_bank
+def get_cam_pvu(alpha, beta):
+    # inclination θ, azimuth φ
+    theta = np.pi/2 - beta
+    phi = alpha
+    cam_vx = np.sin(theta) * np.cos(phi)
+    cam_vy = np.sin(theta) * np.sin(phi)
+    cam_vz = np.cos(theta)
+       
+    theta = -beta
+    phi = alpha
+    cam_ux = np.sin(theta) * np.cos(phi)
+    cam_uy = np.sin(theta) * np.sin(phi)
+    cam_uz = np.cos(theta)
+    
+    cam_v = [cam_vx, cam_vy, cam_vz]
+    cam_u = [cam_ux, cam_uy, cam_uz]
+    cam_p = [0.23, 0.0, 0.67]
+    
+    return cam_p, cam_v, cam_u
 
 if __name__ == "__main__":
-    #LOGFILE = "log10s.txt"
-    #logf = open(LOGFILE, "w")
-
     gui = True
-    r = PyBulletRobot(4, 4, render=gui)
-
-    #set_headcam_params(W, H)
-
-    # Target and manipulator are both NNE
-    r.setTarget([1.5, 1.5, 1])
+    r = PyBulletRobot(4, 1, render=gui)
 
     if gui:
         s_t_theta = p.addUserDebugParameter("t_theta", -np.pi/2, np.pi/2, 0)
         s_t_phi = p.addUserDebugParameter("t_phi", -np.pi, np.pi, 0)
 
-        phiSliders = []
-        for i in range(r.NS):    
-          for j in [0, 1]:
-            title = "%d:%d" % (i, j)
-            s = p.addUserDebugParameter(title, -1.5, 1.5, 0)
-            phiSliders.append((i, j,s))
-    else:
-        phis = np.zeros((r.NS, 2), dtype=np.float32)
-        #for i in range(NJ * 2):
-        #phis.append(0)
+    alpha = 0
+    dalpha = 0.01
+
+    model = tf.keras.models.load_model('pose2phis')
 
     old_t_theta, old_t_phi = None, None
-    old_phis = None
     while True:
-        do_step = False
         
         if gui:
             TR = 3
@@ -55,35 +57,16 @@ if __name__ == "__main__":
 
                 do_step = True
 
-            phis = np.zeros((r.NS, 2), dtype=np.float32)
-            for (i, j, s) in phiSliders:
-                phi = p.readUserDebugParameter(s)
-                phis[i, j] = phi
+        cam_p, cam_v, cam_u = get_cam_pvu(alpha, 0)
+        pose = np.array([cam_p + cam_v + cam_u], dtype=np.float32)
+        phis = model.predict(pose)
+        r.step(phis.reshape(-1, 2))
 
-            #print("%s <=> %s" % (old_phis, phis))
-            if old_phis is None or not np.array_equal(phis, old_phis):
-                old_phis = phis
-
-                do_step = True
-
-        if not do_step:
+        offc = r.getOffCenter()
+        if offc is None:
             continue
 
-        r.step(phis)
-        
-        #imb = r.getImbalance()
-        #print("imb %s" % imb)
-        offc = r.getOffCenter()
-        print("offc %s" % str(offc))
-
-        #cam_p, cam_v, _cap_u = r.getCamPVU()
-        #print("cam_p %s, cam_v %s" % (cam_p, cam_v))
-
-        img = r.getCameraImage()
-        #print("horizon_bank=%s" % get_horizon_bank(img))
-
-        #print("oc=%s, qval=%f, done=%s" % ((r.dx, r.dy), r.qval, r.done))
-
-        #print("%f %f" % (t, reward), file=logf)
-
-    #logf.close()
+        if offc[0] > 0:
+            alpha += dalpha
+        elif offc[0] < 0:
+            alpha -= dalpha

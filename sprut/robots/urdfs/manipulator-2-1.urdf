@@ -41,7 +41,7 @@
   <joint name="Joint_0a" type="revolute">
     <parent link="SprutBase"/>
     <child link="Block0"/>
-    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.112000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -80,7 +80,7 @@
   <joint name="PlateFixJoint0b" type="fixed">
     <parent link="PlateFixLink0"/>
     <child link="Plate0"/>
-    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.112000"/>
     <axis xyz="-1 0 0"/>
   </joint>
 
@@ -104,7 +104,7 @@
   <joint name="Joint_1a" type="revolute">
     <parent link="Plate0"/>
     <child link="Block1"/>
-    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.112000"/>
     <axis xyz="0 1 0"/>
     <limit effort="1000.0" lower="-1.0" upper="1.0" velocity="1000.0"/>
   </joint>
@@ -143,7 +143,7 @@
   <joint name="PlateFixJoint1b" type="fixed">
     <parent link="PlateFixLink1"/>
     <child link="Plate1"/>
-    <origin rpy="0 0 0" xyz="0 0 0.028000"/>
+    <origin rpy="0 0 0" xyz="0 0 0.112000"/>
     <axis xyz="-1 0 0"/>
   </joint>
 

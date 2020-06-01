@@ -17,8 +17,8 @@ if __name__ == "__main__":
     #LOGFILE = "log10s.txt"
     #logf = open(LOGFILE, "w")
 
-    gui = False
-    r = PyBulletRobot(4, 4, render=gui)
+    gui = True
+    r = PyBulletRobot(3, 1, render=gui)
 
     #set_headcam_params(W, H)
 
@@ -83,6 +83,7 @@ if __name__ == "__main__":
         #    continue
 
         phis = np.random.uniform(low=-MAX_PHI, high=MAX_PHI, size=(r.NS, 2))
+        phis[0][0] = np.random.uniform(low=-MAX_PHI/4, high=0)
         r.step(phis)
         
         #imb = r.getImbalance()

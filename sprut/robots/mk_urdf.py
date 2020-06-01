@@ -181,6 +181,7 @@ class URDFPrinter():
     print(self.manipulator_base_template % {"base_name": self.base_name}, file=f)
 
     JD = 0.028 # 4mm plate + 24mm to the axis
+    JD *= 4
     NJ = NS * NP
     for i in range(NJ):
       if i > 0:
