@@ -10,7 +10,7 @@ objp = np.zeros((N*M, 3), np.float32)
 objp[:,:2] = np.mgrid[0:N, 0:M].T.reshape(-1, 2)
 axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
 
-FNAME = None # "cal.npz"
+FNAME = "cal.npz"
 
 flags = cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY
 
@@ -27,20 +27,18 @@ def img2img(img):
     if not retval:
         return None
 
-    img = cv2.drawChessboardCorners(img, (N, M), corners, retval)
-    return img
-
     # Find the rotation and translation vectors.
     _, rvecs, tvecs, inliers = cv2.solvePnPRansac(objp, corners, mtx, dist)
     # project 3D points to image plane
     imgpts, _jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
 
-    img = draw_axis(img, corners, imgpts)
+    img2 = cv2.drawChessboardCorners(img, (N, M), corners, retval)
+    img2 = draw_axis(img2, corners, imgpts)
 
     d = np.sqrt(np.sum(tvecs**2))
 
     print(d, tvecs.ravel(), rvecs.ravel())
-    return img
+    return img2
 
 # ========================================================================
 
@@ -50,12 +48,9 @@ def img2img(img):
 W, H = 1920, 1080
 
 # Load previously saved data
-if FNAME:
-    with np.load(FNAME) as CAL:
-        mtx, dist, _, _ = [CAL[i] for i in ('mtx','dist','rvecs','tvecs')]
-    newcameramtx, _roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (W, H), 1, (W, H))
-else:
-    newcameramtx = None
+with np.load(FNAME) as CAL:
+    mtx, dist, _, _ = [CAL[i] for i in ('mtx','dist','rvecs','tvecs')]
+newcameramtx, _roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (W, H), 1, (W, H))
 
 if False:
     for fname in glob.glob('*.jpg'):
@@ -79,11 +74,7 @@ else:
             print("Failed to retrieve frame")
             break 
 
-        if newcameramtx is not None:
-            img2 = cv2.undistort(img, mtx, dist, None, newcameramtx)
-        else:
-            img2 = img
-
+        img2 = cv2.undistort(img, mtx, dist, None, newcameramtx)
         img2 = img2img(img2)
         if img2 is None:
             img2 = img
