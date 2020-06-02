@@ -1,3 +1,7 @@
+"""
+Grabs frames from the camera and shows them
+"""
+
 import cv2
 import time
 
