@@ -10,7 +10,7 @@ objp = np.zeros((N*M, 3), np.float32)
 objp[:,:2] = np.mgrid[0:N, 0:M].T.reshape(-1, 2)
 axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
 
-FNAME = "cal.npz"
+FNAME = None # "cal.npz"
 
 flags = cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY
 
@@ -27,30 +27,35 @@ def img2img(img):
     if not retval:
         return None
 
+    img = cv2.drawChessboardCorners(img, (N, M), corners, retval)
+    return img
+
     # Find the rotation and translation vectors.
     _, rvecs, tvecs, inliers = cv2.solvePnPRansac(objp, corners, mtx, dist)
     # project 3D points to image plane
     imgpts, _jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
 
-    img2 = cv2.drawChessboardCorners(img, (N, M), corners, retval)
-    img2 = draw_axis(img2, corners, imgpts)
+    img = draw_axis(img, corners, imgpts)
 
     d = np.sqrt(np.sum(tvecs**2))
 
     print(d, tvecs.ravel(), rvecs.ravel())
-    return img2
+    return img
 
 # ========================================================================
 
-cv2.namedWindow("img", cv2.WND_PROP_FULLSCREEN)
-cv2.setWindowProperty("img", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+#cv2.namedWindow("img", cv2.WND_PROP_FULLSCREEN)
+#cv2.setWindowProperty("img", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 W, H = 1920, 1080
 
 # Load previously saved data
-with np.load(FNAME) as CAL:
-    mtx, dist, _, _ = [CAL[i] for i in ('mtx','dist','rvecs','tvecs')]
-newcameramtx, _roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (W, H), 1, (W, H))
+if FNAME:
+    with np.load(FNAME) as CAL:
+        mtx, dist, _, _ = [CAL[i] for i in ('mtx','dist','rvecs','tvecs')]
+    newcameramtx, _roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (W, H), 1, (W, H))
+else:
+    newcameramtx = None
 
 if False:
     for fname in glob.glob('*.jpg'):
@@ -74,7 +79,11 @@ else:
             print("Failed to retrieve frame")
             break 
 
-        img2 = cv2.undistort(img, mtx, dist, None, newcameramtx)
+        if newcameramtx is not None:
+            img2 = cv2.undistort(img, mtx, dist, None, newcameramtx)
+        else:
+            img2 = img
+
         img2 = img2img(img2)
         if img2 is None:
             img2 = img
