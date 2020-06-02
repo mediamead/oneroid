@@ -15,6 +15,8 @@ def save(img):
     cv2.imwrite(filename, img)
     print("captured image saved in '%s'" % filename)
 
+print("### Press 's' to save the frame, 'q' to quit")
+
 while True:
     retval, img = cap.read()
     assert(retval)
