@@ -1,5 +1,5 @@
 """
-Calibrates on chessboard images found in the current directory.
+Calibrates on chessboard images *.jpg from the current directory.
 Expects 14x9 chessboard (see findChessboardCornersSB).
 Saves calibration data into 'cal.npz'
 

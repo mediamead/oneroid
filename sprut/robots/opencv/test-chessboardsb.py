@@ -1,3 +1,7 @@
+"""
+Finds chessboard in the frame and draws lines/circles on it.
+"""
+
 import numpy as np
 import cv2
 import glob
@@ -23,7 +27,7 @@ while True:
     cv2.imshow('img', img2)
 
     k = cv2.waitKey(30) & 0xff
-    if k == 27:
+    if k == ord('q'):
         break
 
 cap.release() 
