@@ -5,7 +5,7 @@ import glob
 np.set_printoptions(linewidth=100, formatter={'float_kind': "{:6.3f}".format})
 
 flags = cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY
-axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
+axis = np.float32([[0.5, 0, 0], [0, 0.5, 0], [0, 0, -0.5]]).reshape(-1,3)
 
 class Camera:
     # chessboard dimensions
@@ -14,6 +14,8 @@ class Camera:
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
     objp = np.zeros((N*M, 3), np.float32)
     objp[:,:2] = np.mgrid[0:N, 0:M].T.reshape(-1, 2)
+    objp *= 0.0232 # door
+    #objp *= 0.0423 # tv
 
     def __init__(self, cam, W, H):
         self.W = W
@@ -94,7 +96,8 @@ class Camera:
 #cv2.namedWindow("img", cv2.WND_PROP_FULLSCREEN)
 #cv2.setWindowProperty("img", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-cap = Camera(1, 1920, 1080)
+cap = Camera(0, 1920, 1080)
+#print(cap.objp)
 
 m0 = None
 
@@ -107,12 +110,11 @@ while True:
     else:
         d = np.sqrt(np.sum(tvecs**2))
         m = np.concatenate((np.array([d]), tvecs.ravel(), rvecs.ravel()))
-        if m0 is None:
-            m0 = m
-        dm = m - m0
-        print("%10.3f | %30s | %30s" % (dm[0], dm[1:4], dm[4:7]))
+        if m0 is not None:
+            m -= m0
+        print("%10.3f | %30s | %30s" % (m[0], m[1:4], m[4:7]))
 
-    cv2.imshow('img', img2) 
+    cv2.imshow('img', img2)
 
     k = cv2.waitKey(1) & 0xFF
     if k == ord("q"): 
