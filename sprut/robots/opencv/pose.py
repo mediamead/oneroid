@@ -4,8 +4,12 @@ import glob
 
 np.set_printoptions(linewidth=100, formatter={'float_kind': "{:6.3f}".format})
 
+D = 0.0423 # TV  0.0232 # door
+DD = D*5
+
 flags = cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY
-axis = np.float32([[0.5, 0, 0], [0, 0.5, 0], [0, 0, -0.5]]).reshape(-1,3)
+zero = np.float32([[0, 0, 0]]).reshape(-1,3)
+axis = np.float32([[DD, 0, 0], [0, DD, 0], [0, 0, DD]]).reshape(-1,3)
 
 class Camera:
     # chessboard dimensions
@@ -14,8 +18,9 @@ class Camera:
     # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
     objp = np.zeros((N*M, 3), np.float32)
     objp[:,:2] = np.mgrid[0:N, 0:M].T.reshape(-1, 2)
-    objp *= 0.0232 # door
-    #objp *= 0.0423 # tv
+    objp *= D
+    objp[:, 0] -= D*7
+    objp[:, 1] -= D*4
 
     def __init__(self, cam, W, H):
         self.W = W
@@ -65,11 +70,12 @@ class Camera:
         _, rvecs, tvecs, _ = cv2.solvePnPRansac(self.objp, corners, self.mtx, self.dist)
         return rvecs, tvecs
 
-    def _draw_axis(self, img, corners, imgpts):
-        corner = tuple(corners[0].ravel())
-        img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
-        img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
-        img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
+    def _draw_axis(self, img, zeropt, imgpts):
+        #corner = tuple(corners[0].ravel())
+        zeropt =tuple(zeropt.ravel())
+        img = cv2.line(img, zeropt, tuple(imgpts[0].ravel()), (255,0,0), 5)
+        img = cv2.line(img, zeropt, tuple(imgpts[1].ravel()), (0,255,0), 5)
+        img = cv2.line(img, zeropt, tuple(imgpts[2].ravel()), (0,0,255), 5)
         return img
 
     def findChessboardRTVecs(self, img, drawAxis=False):
@@ -81,10 +87,11 @@ class Camera:
 
         rvecs, tvecs = self.solvePnP(corners)
         if drawAxis:
+            zeropts, _ = cv2.projectPoints(zero, rvecs, tvecs, self.mtx, self.dist)
             imgpts, _ = cv2.projectPoints(axis, rvecs, tvecs, self.mtx, self.dist)
 
             img = cv2.drawChessboardCorners(img, (self.N, self.M), corners, retval)
-            img = self._draw_axis(img, corners, imgpts)
+            img = self._draw_axis(img, zeropts[0], imgpts)
 
         return img, rvecs, tvecs
 
