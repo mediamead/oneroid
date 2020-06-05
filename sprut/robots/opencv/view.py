@@ -4,9 +4,10 @@ Grabs frames from the camera and shows them
 
 import cv2
 import time
+import sys
 
 # Get resolution
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(int(sys.argv[1]))
 print("Default resolution: %sx%s" % (cap.get(cv2.CAP_PROP_FRAME_WIDTH), cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 
 # Set resolution
