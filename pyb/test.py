@@ -13,11 +13,12 @@ def degree2rad(a):
 
 if __name__ == "__main__":
     gui = True
-    r = PyBulletRobot(4, 1, render=gui)
+    r = PyBulletRobot(4, 4, render=gui)
     pose = Pose(r.W, r.H, "cal.npz", r.D)
 
     phis = np.zeros((r.NS, 2), dtype=np.float32)
-    phis[:,0] = 90/4
+    phis[0,0] = -30
+    phis[1:,0] = 30
 
     if gui:
         # configure GUI sliders

@@ -96,15 +96,9 @@ class PyBulletRobot(object):
         ##("## PYBULLETROBOT: joint=%d pos=%.3f" % (joint, pos))
 
     def _setJointPosition(self, sec, pos0, pos1):
-        pos0 /= self.NP
-        pos1 /= self.NP
-
-        for p in range(self.NP):
-            j = (sec * self.NP + p) * 3
-          #if p != 0:
-            self._setJointMotorPosition(j, pos0)
-          #if p != NP-1:
-            self._setJointMotorPosition(j + 1, pos1)
+        j = (sec * self.NP) * 3
+        self._setJointMotorPosition(j, pos0)
+        self._setJointMotorPosition(j + 1, pos1)
 
 # --------------------------------------------------------------------
 
