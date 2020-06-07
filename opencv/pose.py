@@ -5,12 +5,13 @@ import glob
 
 from opencv_camera import Camera
 from opencv_pose import Pose
+from opencv_tools import resize
 
 np.set_printoptions(linewidth=100, formatter={'float_kind': "{:6.3f}".format})
 
-#D = 0.0423 # TV
+D = 0.0423 # TV
 #D = 0.0232 # A3
-D = 0.0116 # A4 (home tests)
+#D = 0.0116 # A4 (home tests)
 
 cam_n = int(sys.argv[1])
 cam = Camera(cam_n, 1920, 1080)
@@ -20,6 +21,7 @@ m0 = None
 
 while True:
     img = cam.read()
+    #img = cv2.rotate(img, cv2.ROTATE_180)
 
     retval, rvecs, tvecs, corners = pose.findChessboardRTVecs(img)
     if retval:
@@ -31,6 +33,7 @@ while True:
             m -= m0
         print("%10.3f | %30s | %30s" % (m[0], m[1:4], m[4:7]))
 
+    img = resize(img, 0.5)
     cv2.imshow('img', img)
 
     k = cv2.waitKey(1) & 0xFF
