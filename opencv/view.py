@@ -1,0 +1,25 @@
+"""
+Grabs frames from the camera and displays it
+"""
+import sys
+import cv2
+from opencv_camera import Camera
+from opencv_tools import save
+
+print("### Press 's' to save the frame, 'q' to quit")
+
+cam_n = int(sys.argv[1])
+cam = Camera(cam_n, 1920, 1080)
+
+while True:
+    img = cam.read()
+
+    cv2.imshow('img', img)
+
+    k = cv2.waitKey(1) & 0xff
+    if k == ord('q'):
+        break
+    elif k == ord('s'):
+        save(img)
+
+cam.close()
