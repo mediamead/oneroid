@@ -1,29 +1,22 @@
 #!/usr/bin/env python3
 
 import pybullet as p
-import time
 import pybullet_data
-import numpy as np
-
-import cv2
-
-#H = 720
-#W = 1280
-#H = 144
-#W = 256
-# https://www.chiefdelphi.com/t/horizontal-fov-of-microsoft-lifecam-cinema/156204/7
-HFOV = 40 # 64.4
 
 import os
+import time
+import numpy as np
+import cv2
 
 BASEDIR = os.path.dirname(__file__)
 
 class PyBulletRobot(object):
-    # camera resolution
-    H = 1080
-    W = 1920
+    # camera resolution and horizontal field of view
+    W = 1280
+    H = 720
+    FOVX = 64 # https://www.chiefdelphi.com/t/horizontal-fov-of-microsoft-lifecam-cinema/156204/7
     # chessboard pattern tile size
-    D = 0.0423 # TV & VR
+    D = 0.0423 # TV
 
     def __init__(self, NS, NP, render=False):
         self.NS = NS
@@ -58,7 +51,7 @@ class PyBulletRobot(object):
 
         # configure the camera
         aspect = self.W / self.H
-        self.projection_matrix = p.computeProjectionMatrixFOV(HFOV, aspect, 0.1, 3)
+        self.projection_matrix = p.computeProjectionMatrixFOV(self.FOVX, aspect, 0.1, 3)
 
         self.targetId = None
         print("*** Initializing PyBulletRobot() done")
