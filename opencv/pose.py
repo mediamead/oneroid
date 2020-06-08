@@ -14,7 +14,7 @@ D = 0.0423 # TV
 #D = 0.0116 # A4 (home tests)
 
 cam_n = int(sys.argv[1])
-cam = Camera(cam_n, 1920, 1080)
+cam = Camera(cam_n, 1280, 720)
 pose = Pose(cam.W, cam.H, "cal.npz", D)
 
 m0 = None
