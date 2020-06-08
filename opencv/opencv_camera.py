@@ -9,7 +9,7 @@ class Camera:
         self.W = W
         self.H = H
 
-        self.cap = cv2.VideoCapture(cam_n) 
+        self.cap = cv2.VideoCapture(cam_n) #, cv2.CAP_DSHOW)
         self.setResolution()
 
     def getResolution(self):
