@@ -15,4 +15,4 @@ def showCalibration(W, H, PHY_W, PHY_H, cal_file):
     print("fovx\t\t%f\nfovy\t\t%f\nfocalLength\t%f\nprincipalPoint\t%s\naspectRatio\t%f" % values)
 
 # https://www.astrobin.com/gear/9596/microsoft-lifecam-studio-hd/
-showCalibration(1920, 1080, 5.85, 3.27, sys.argv[1])
+showCalibration(1280, 720, 5.85, 3.27, sys.argv[1])
