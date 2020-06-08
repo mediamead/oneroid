@@ -17,7 +17,7 @@ if __name__ == "__main__":
     pose = Pose(r.W, r.H, "cal.npz", r.D)
 
     phis = np.zeros((r.NS, 2), dtype=np.float32)
-    phis[0,0] = -30
+    phis[0,0] = 0
     phis[1:,0] = 30
 
     if gui:

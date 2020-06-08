@@ -11,7 +11,7 @@ import pybullet as p
 import numpy as np
 from opencv.opencv_tools import save
 
-from pybullet_robot import PyBulletRobot, W, H
+from pybullet_robot import PyBulletRobot
 
 def calibrate(phi1x, phi1y, phi2x, phi2y):
     phis = np.array([[-np.pi/8, 0], [phi1x, phi1y], [phi2x, phi2y/2], [phi2x, phi2y/2]])
@@ -22,12 +22,11 @@ def calibrate(phi1x, phi1y, phi2x, phi2y):
     cv2.imshow('img', img)
     cv2.waitKey(1)
 
-    print(phis)
     save(img)
 
 if __name__ == "__main__":
     gui = True
-    r = PyBulletRobot(4, 1, render=gui)
+    r = PyBulletRobot(4, 4, render=gui)
 
     phisx_sweep = [np.pi/4.5, np.pi/5, np.pi/5.5]
     phisy_sweep = [-np.pi/8, 0, np.pi/8]
