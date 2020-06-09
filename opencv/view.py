@@ -9,7 +9,8 @@ from opencv_tools import save, resize
 print("### Press 's' to save the frame, 'q' to quit")
 
 cam_n = int(sys.argv[1])
-cam = Camera(cam_n, 1280, 720)
+#cam = Camera(cam_n, 1280, 720)
+cam = Camera(cam_n, 1920, 1080)
 
 while True:
     img = cam.read()

@@ -10,6 +10,8 @@ class Camera:
         self.H = H
 
         self.cap = cv2.VideoCapture(cam_n) #, cv2.CAP_DSHOW)
+        #self.cap.set(cv2.CAP_PROP_AUTOFOCUS, 0) # turn the autofocus off
+
         self.setResolution()
 
     def getResolution(self):

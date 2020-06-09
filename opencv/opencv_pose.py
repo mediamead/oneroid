@@ -6,7 +6,7 @@ taked by a calibrated OpenCV camera.
 import cv2
 import numpy as np
 
-flags = cv2.CALIB_CB_NORMALIZE_IMAGE | cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY
+flags = cv2.CALIB_CB_EXHAUSTIVE | cv2.CALIB_CB_ACCURACY
 zero = np.float32([[0, 0, 0]]).reshape(-1,3)
 
 class Pose:
@@ -21,8 +21,9 @@ class Pose:
 
     def loadCalibration(self, W, H, cal_file):
         with np.load(cal_file) as CAL:
-            self.mtx, self.dist, _, _ = [CAL[i] for i in ('mtx', 'dist', 'rvecs', 'tvecs')]
+            self.mtx, self.dist, cal_w, cal_h = [CAL[i] for i in ('mtx', 'dist', 'cal_w', 'cal_h')]
 
+        assert((cal_w == W) and (cal_h == H))
         self.newcameramtx, _roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist,
             (W, H), 1, (W, H))
 
