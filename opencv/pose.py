@@ -1,3 +1,7 @@
+"""
+Grabs frames from the camera and displays it (half size) with axes drawn on top
+"""
+
 import sys
 import cv2
 import numpy as np
@@ -34,8 +38,8 @@ while True:
             m -= m0
         print("%10.3f | %30s | %30s" % (m[0], m[1:4], m[4:7]))
 
-    img = resize(img, 0.5)
-    cv2.imshow('img', img)
+    img2 = resize(img, 0.5)
+    cv2.imshow('img', img2)
 
     k = cv2.waitKey(1) & 0xFF
     if k == ord("q"): 

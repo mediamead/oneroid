@@ -1,5 +1,5 @@
 """
-Grabs frames from the camera and displays it
+Grabs frames from the camera and displays it half size
 """
 import sys
 import cv2
