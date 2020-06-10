@@ -4,13 +4,15 @@ Grabs frames from the camera and displays it half size
 import sys
 import cv2
 from opencv_camera import Camera
-from opencv_tools import save, resize
+from opencv_tools import resize, init_argparser, run_argparser
+
+parser = init_argparser(cal_required=False)
+args, params = run_argparser(parser)
 
 print("### Press 's' to save the frame, 'q' to quit")
 
-cam_n = int(sys.argv[1])
 #cam = Camera(cam_n, 1280, 720)
-cam = Camera(cam_n, 1920, 1080)
+cam = Camera(args.cam_device, 1920, 1080)
 
 while True:
     img = cam.read()

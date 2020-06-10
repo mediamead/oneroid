@@ -9,18 +9,15 @@ import glob
 
 from opencv_camera import Camera
 from opencv_pose import Pose
-from opencv_tools import resize
+from opencv_tools import resize, init_argparser, run_argparser
 
 np.set_printoptions(linewidth=100, formatter={'float_kind': "{:6.3f}".format})
 
-D = 0.0423 # TV
-#D = 0.0232 # A3
-#D = 0.0116 # A4 (home tests)
+parser = init_argparser(cal_required=True)
+args, params = run_argparser(parser)
 
-cam_n = int(sys.argv[1])
-#cam = Camera(cam_n, 1280, 720)
-cam = Camera(cam_n, 1920, 1080)
-pose = Pose(cam.W, cam.H, "cal.npz", D)
+cam = Camera(args.cam_device, 1920, 1080)
+pose = Pose(cam.W, cam.H, args.cal_file, params['D'])
 
 m0 = None
 
