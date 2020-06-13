@@ -7,6 +7,8 @@ This script is used to capture calibration images. It:
 Normally you should run this script in a dedicated cal-XXX/directory first,
 then run calibrate.py in the same directory.
 """
+import time
+
 from manipulator import Manipulator
 from scenario import Scenario
 from XXX import Camera
@@ -20,6 +22,7 @@ def move_n_capture(m, poss, cam, pose):
     for i in range(1, len(poss)):
         print("*** Position %d of %d ***" % (i, len(poss)-1))
         m.move(poss[i].pos)
+        time.sleep(1)
 
         while True:
             img = cam.read()
@@ -27,10 +30,11 @@ def move_n_capture(m, poss, cam, pose):
             if retval:
                 utils.imshow2(img2)
                 utils.save(img)
+                print("# chessboard found!")
                 break
             else:
                 utils.imshow2(img)
-                print("# chessboard is not found")
+                print("# chessboard is not found, retrying ...")
 
 # ------------------------------------------------------
 
