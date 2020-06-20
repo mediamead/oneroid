@@ -108,7 +108,15 @@ class PyBulletRobot(object):
         cam_v, cam_u = self.orn2vu(cam_o)
         return [cam_p, cam_v, cam_u]
 
-    def orn2vu(sel, cam_o):
+    def getHeadcam(self):
+        cam_p, cam_o = self.getHeadcamPO()
+        cam_v, cam_u = self.orn2vu(cam_o)
+        pvu = [cam_p, cam_v, cam_u]
+
+        img = self.getCameraBGRImage(pvu=pvu)
+        return img, cam_p, cam_o, cam_v, cam_u
+
+    def orn2vu(self, cam_o):
         rot_matrix = p.getMatrixFromQuaternion(cam_o)
         rot_matrix = np.array(rot_matrix).reshape(3, 3)
 
@@ -128,11 +136,11 @@ class PyBulletRobot(object):
         """
         if pvu is None:
             pvu = self.getHeadcamPVU()
-            (cam_p, camera_vector, up_vector) = pvu
-        else:
-            cam_p = np.array(pvu[0])
-            camera_vector = np.array(pvu[1])
-            up_vector = np.array(pvu[2])
+        (cam_p, camera_vector, up_vector) = pvu
+        #else:
+        #    cam_p = np.array(pvu[0])
+        #    camera_vector = np.array(pvu[1])
+        #    up_vector = np.array(pvu[2])
 
         view_matrix = p.computeViewMatrix(
             cam_p, cam_p + 0.1 * camera_vector, up_vector)
@@ -141,12 +149,16 @@ class PyBulletRobot(object):
 
         return imgs
 
-    def getCameraImage(self, pvu=None, segmask=False):
-        imgs = self.getCameraImages()
-        rgba = np.reshape(imgs[2], (self.H, self.W, 4)).astype(np.uint8)
-        img = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
+    def getCameraRGBAImage(self, pvu=None, segmask=False):
+        imgs = self.getCameraImages(pvu)
+        rgba = np.reshape(imgs[2], (self.H, self.W, 4)).astype(np.float32)
+        return rgba
 
-        return img
+    def getCameraBGRImage(self, pvu=None, segmask=False):
+        imgs = self.getCameraImages(pvu)
+        rgba = np.reshape(imgs[2], (self.H, self.W, 4)).astype(np.uint8)
+        bgr = cv2.merge((rgba[:,:,2], rgba[:,:,1], rgba[:,:,0])) # take BGR from RBGA
+        return bgr
 
     def getOffCenter(self):
         segmask = self.getCameraImages()[4]
