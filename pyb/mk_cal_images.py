@@ -25,8 +25,7 @@ def calibrate(phi1x, phi1y, phi2x, phi2y):
     save(img)
 
 if __name__ == "__main__":
-    gui = True
-    r = PyBulletRobot(4, 4, render=gui)
+    r = PyBulletRobot(4, 4, render=False)
 
     phisx_sweep = [np.pi/4.5, np.pi/5, np.pi/5.5]
     phisy_sweep = [-np.pi/8, 0, np.pi/8]
@@ -35,4 +34,5 @@ if __name__ == "__main__":
         for phi1y in phisy_sweep:
             for phi2x in phisx_sweep:
                 for phi2y in phisy_sweep:
+                    print([phi1x, phi1y, phi2x, phi2y])
                     calibrate(phi1x, phi1y, phi2x, phi2y)
