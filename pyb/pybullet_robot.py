@@ -12,8 +12,8 @@ BASEDIR = os.path.dirname(__file__)
 
 class PyBulletRobot(object):
     # camera resolution and horizontal field of view
-    W = 1280
-    H = 720
+    W = 1920
+    H = 1080
     FOVX = 64 # https://www.chiefdelphi.com/t/horizontal-fov-of-microsoft-lifecam-cinema/156204/7
     # chessboard pattern tile size
     D = 0.0423 # TV
@@ -51,7 +51,7 @@ class PyBulletRobot(object):
 
         # configure the camera
         aspect = self.W / self.H
-        self.projection_matrix = p.computeProjectionMatrixFOV(self.FOVX, aspect, 0.1, 3)
+        self.projection_matrix = p.computeProjectionMatrixFOV(self.FOVX/aspect, aspect, 0.1, 3)
 
         self.targetId = None
         print("*** Initializing PyBulletRobot() done")
