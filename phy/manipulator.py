@@ -3,7 +3,7 @@
 N_AXIS = 8
 
 import time
-from grbl import Grbl, find_ports
+from phy.grbl import Grbl, find_ports
 
 class Manipulator(object):
     class GrblAxisMap:
@@ -30,7 +30,10 @@ class Manipulator(object):
             return m['n'], cmd
 
     def __init__(self, speed=115200, homing=False, dry_run=False):
-        port1, port2 = find_ports()
+        if not dry_run:
+            port1, port2 = find_ports()
+        else:
+            port1, port2 = "/dummy1", "/dummy2"
 
         self.grbls = []
         self.grbls.append(Grbl(port1, speed, homing, dry_run))
