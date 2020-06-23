@@ -7,6 +7,7 @@ pip install pybullet
 *** Usage
 
 set PYTHONPATH=%CD%
+export PYTHONPATH=`pwd`
 
 opencv/
     view.py             - grabs frames from the camera, displays, saves (for calibration)
