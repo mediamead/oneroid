@@ -26,7 +26,7 @@ class Manipulator(object):
     
         def get_gcode(self, axis, pos):
             m = self.axis_map[axis]
-            cmd = "%s%d" % (m['axis'], pos * m['scale'])
+            cmd = "%s%.3f" % (m['axis'], pos * m['scale'])
             return m['n'], cmd
 
     def __init__(self, speed=115200, homing=False, dry_run=False):

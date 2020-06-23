@@ -1,6 +1,6 @@
 ** Installation
 
-conda create -n oneroid3 -c conda-forge opencv=4 tensorflow-gpu notebook pandas matplotlib
+conda create -n oneroid3 -c conda-forge opencv=4 tensorflow-gpu notebook pandas matplotlib pyserial
 conda activate oneroid3
 pip install pybullet
 
