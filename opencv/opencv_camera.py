@@ -5,24 +5,25 @@ Camera class implements initialiation and frame grabbing from OpenCV cameras.
 import cv2
 
 class Camera:
-    def __init__(self, cam_n, W, H):
-        self.W = W
-        self.H = H
-
+    def __init__(self, cam_n, res=None):
         self.cap = cv2.VideoCapture(cam_n) #, cv2.CAP_DSHOW)
         #self.cap.set(cv2.CAP_PROP_AUTOFOCUS, 0) # turn the autofocus off
 
-        self.setResolution()
+        if res is not None:
+            self.setResolution(res)
+        else:
+            self.W, self.H = self.getResolution()
 
     def getResolution(self):
         return self.cap.get(cv2.CAP_PROP_FRAME_WIDTH), self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
-    def setResolution(self):
+    def setResolution(self, res):
         # Get resolution
-        W1, H1 = self.getResolution()
-        print("Current resolution: %sx%s" % (W1, H1))
+        W0, H0 = self.getResolution()
+        print("Current resolution: %sx%s" % (W0, H0))
 
         # Set resolution
+        self.W, self.H = int(res[0]), int(res[1])
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.W)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.H)
 

@@ -9,17 +9,19 @@ import glob
 
 from opencv_camera import Camera
 from opencv_pose import Pose
-from opencv_tools import resize, init_argparser, run_argparser
+from opencv_tools import resize, save, init_argparser, run_argparser
 
 np.set_printoptions(linewidth=100, formatter={'float_kind': "{:6.3f}".format})
 
 parser = init_argparser(cal_required=True)
 args, params = run_argparser(parser)
 
-cam = Camera(args.cam_device, 1920, 1080)
+cam = Camera(args.cam_device, (1920, 1080))
 pose = Pose(cam.W, cam.H, args.cal_file, params['D'])
 
 m0 = None
+
+print("### Press 's' to save the frame, 'q' to quit")
 
 while True:
     img = cam.read()
@@ -27,20 +29,24 @@ while True:
 
     retval, rvecs, tvecs, corners = pose.findChessboardRTVecs(img)
     if retval:
-        img = pose.drawAxes(img, rvecs, tvecs, corners)
+        img2 = pose.drawAxes(img, rvecs, tvecs, corners)
 
         d = np.sqrt(np.sum(tvecs**2))
         m = np.concatenate((np.array([d]), tvecs.ravel(), rvecs.ravel()))
         if m0 is not None:
             m -= m0
         print("%10.3f | %30s | %30s" % (m[0], m[1:4], m[4:7]))
+    else:
+        img2 = img
 
-    img2 = resize(img, 0.5)
+    img2 = resize(img2, 0.5)
     cv2.imshow('img', img2)
 
     k = cv2.waitKey(1) & 0xFF
     if k == ord("q"): 
-        break 
+         break
+    elif k == ord('s'):
+        save(img)
     elif k == ord(" "):
         m0 = m
 

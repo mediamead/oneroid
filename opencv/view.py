@@ -11,7 +11,7 @@ args, params = run_argparser(parser)
 
 print("### Press 's' to save the frame, 'q' to quit")
 
-cam = Camera(args.cam_device, 1920, 1080)
+cam = Camera(args.cam_device)
 
 while True:
     img = cam.read()
