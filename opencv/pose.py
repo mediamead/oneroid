@@ -23,6 +23,11 @@ m0 = None
 
 print("### Press 's' to save the frame, 'q' to quit")
 
+x1 = int(cam.W / 2)
+x2 = cam.W - 1
+y1 = cam.H - 1
+y2 = int(cam.H / 2)
+
 while True:
     img = cam.read()
     #img = cv2.rotate(img, cv2.ROTATE_180)
@@ -30,6 +35,9 @@ while True:
     retval, rvecs, tvecs, corners = pose.findChessboardRTVecs(img)
     if retval:
         img2 = pose.drawAxes(img, rvecs, tvecs, corners)
+
+        cv2.line(img2, (x1, 0), (x1, y1), (255, 255, 255))
+        cv2.line(img2, (0, y2), (x2, y2), (255, 255, 255))
 
         d = np.sqrt(np.sum(tvecs**2))
         m = np.concatenate((np.array([d]), tvecs.ravel(), rvecs.ravel()))
