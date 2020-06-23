@@ -25,6 +25,7 @@ class PhyRobot:
     def step(self, phis):
         assert(phis.shape == (4,2))
         phis2 = -phis * 180. / np.pi
+        phis2[0][1] -= 2
         self.m.move(phis2.ravel())
 
     def getHeadcam(self):
