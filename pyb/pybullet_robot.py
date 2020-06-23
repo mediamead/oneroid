@@ -18,7 +18,7 @@ class PyBulletRobot(object):
     # chessboard pattern tile size
     D = 0.0423 # TV
 
-    def __init__(self, NS, NP, render=False):
+    def __init__(self, NS=4, NP=4, render=False):
         self.NS = NS
         self.NP = NP
 
